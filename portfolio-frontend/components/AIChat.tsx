@@ -2,21 +2,38 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createChatSession } from '../services/gemini';
 import { ChatMessage } from '../types';
 import { Chat } from "@google/genai";
+import { useProfile } from '../hooks/usePortfolio';
 
 export const AIChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'Hi. I am Alex\'s AI agent. Ask me anything about his work.' }
-  ]);
+  const { data: profile } = useProfile();
+  const firstName = profile?.full_name?.split(' ')[0] || 'AI';
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatSession, setChatSession] = useState<Chat | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Update initial message when profile loads
+  useEffect(() => {
+    if (profile?.full_name && messages.length === 0) {
+      setMessages([
+        { role: 'model', text: `Hi there! I'm ${profile.full_name}'s AI assistant. How can I help you learn more about ${firstName} today?` }
+      ]);
+    }
+  }, [profile, firstName]);
+
   useEffect(() => {
     if (isOpen && !chatSession) {
-      const session = createChatSession();
-      setChatSession(session);
+      createChatSession().then(session => {
+        if (session) {
+          setChatSession(session);
+        } else {
+          console.error('Failed to create chat session');
+        }
+      }).catch(error => {
+        console.error('Error creating chat session:', error);
+      });
     }
   }, [isOpen, chatSession]);
 
@@ -26,7 +43,13 @@ export const AIChat: React.FC = () => {
 
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!input.trim() || !chatSession) return;
+    if (!input.trim()) return;
+    
+    if (!chatSession) {
+      console.error('Chat session not initialized');
+      setMessages(prev => [...prev, { role: 'model', text: "Chat is still initializing. Please wait a moment and try again." }]);
+      return;
+    }
 
     const userText = input;
     setInput('');
@@ -67,7 +90,9 @@ export const AIChat: React.FC = () => {
       {isOpen && (
         <div className="fixed bottom-24 right-8 z-40 w-80 sm:w-96 bg-white dark:bg-geo-dark-card border border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)] animate-in slide-in-from-bottom-4 fade-in duration-200 flex flex-col max-h-[500px]">
           <div className="p-4 border-b border-black dark:border-white bg-neutral-50 dark:bg-black flex justify-between items-center">
-            <span className="font-display font-bold text-lg tracking-tight text-black dark:text-white">ASK ALEX_AI</span>
+            <span className="font-display font-bold text-lg tracking-tight text-black dark:text-white">
+              ASK {profile?.full_name?.split(' ')[0]?.toUpperCase() || 'AI'}_AI
+            </span>
             <div className="flex space-x-1">
                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>

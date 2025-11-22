@@ -10,6 +10,7 @@ import { Education } from './components/Education';
 import { Footer } from './components/Footer';
 import { AIChat } from './components/AIChat';
 import { SectionId, Theme } from './types';
+import { useProfile } from './hooks/usePortfolio';
 
 // Create QueryClient instance
 const queryClient = new QueryClient({
@@ -24,9 +25,17 @@ const queryClient = new QueryClient({
   },
 });
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>(SectionId.Hero);
   const [theme, setTheme] = useState<Theme>('system');
+  const { data: profile } = useProfile();
+
+  // Update document title dynamically
+  useEffect(() => {
+    if (profile?.full_name) {
+      document.title = `${profile.full_name} | Portfolio`;
+    }
+  }, [profile]);
 
   // Initialize Theme
   useEffect(() => {
@@ -94,20 +103,26 @@ const App: React.FC = () => {
   };
 
   return (
+    <div className="bg-white dark:bg-geo-dark-bg min-h-screen selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
+      <Header activeSection={activeSection} theme={theme} onToggleTheme={cycleTheme} />
+      <main>
+        <Hero />
+        <Profile />
+        <Experience />
+        <Skills />
+        <Projects />
+        <Education />
+      </main>
+      <Footer />
+      <AIChat />
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
     <QueryClientProvider client={queryClient}>
-      <div className="bg-white dark:bg-geo-dark-bg min-h-screen selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
-        <Header activeSection={activeSection} theme={theme} onToggleTheme={cycleTheme} />
-        <main>
-          <Hero />
-          <Profile />
-          <Experience />
-          <Skills />
-          <Projects />
-          <Education />
-        </main>
-        <Footer />
-        <AIChat />
-      </div>
+      <AppContent />
     </QueryClientProvider>
   );
 };
