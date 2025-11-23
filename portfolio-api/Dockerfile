@@ -45,7 +45,11 @@ RUN composer dump-autoload --optimize
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+    && mkdir -p /var/log/supervisor \
+    && chown -R www-data:www-data /var/log/supervisor \
+    && mkdir -p /var/run \
+    && chown -R www-data:www-data /var/run
 
 # Copy nginx configuration
 COPY docker/nginx/default.conf /etc/nginx/sites-available/default
@@ -53,8 +57,12 @@ COPY docker/nginx/default.conf /etc/nginx/sites-available/default
 # Copy supervisor configuration
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Copy startup script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
 # Expose port
 EXPOSE 80
 
-# Start supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Start with script that handles PORT
+CMD ["/start.sh"]

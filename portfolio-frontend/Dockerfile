@@ -29,8 +29,12 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker/env-config.sh /docker-entrypoint.d/env-config.sh
 RUN chmod +x /docker-entrypoint.d/env-config.sh
 
-# Expose port
+# Copy startup script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Expose port 80
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start with script that handles PORT
+CMD ["/start.sh"]

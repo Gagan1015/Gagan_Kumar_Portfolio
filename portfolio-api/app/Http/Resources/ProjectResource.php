@@ -52,11 +52,34 @@ class ProjectResource extends JsonResource
             return $path;
         }
 
-        // If it's a storage path, generate the URL
-        if (Storage::disk('public')->exists($path)) {
+        // Get the configured filesystem disk
+        $disk = config('filesystems.default');
+        
+        // For Cloudinary, return the URL directly
+        if ($disk === 'cloudinary') {
+            try {
+                return Storage::disk('cloudinary')->url($path);
+            } catch (\Exception $e) {
+                // If Cloudinary fails, fall through to placeholder
+            }
+        }
+        
+        // For public disk, check if file exists
+        if ($disk === 'public' && Storage::disk('public')->exists($path)) {
             return url('storage/' . $path);
         }
 
-        return $path;
+        // Return a placeholder image if file doesn't exist
+        // Using a consistent placeholder based on project ID
+        $placeholders = [
+            'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop', // Tech/Business
+            'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&h=600&fit=crop', // Dating/Social
+            'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=800&h=600&fit=crop', // Immigration/Services
+            'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop', // E-commerce
+        ];
+        
+        // Use project ID to consistently map to a placeholder
+        $index = ($this->id - 1) % count($placeholders);
+        return $placeholders[$index];
     }
 }
