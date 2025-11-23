@@ -6,6 +6,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -38,11 +39,11 @@ class ExperienceForm
                 Textarea::make('description')
                     ->default(null)
                     ->columnSpanFull(),
-                Textarea::make('responsibilities')
-                    ->default(null)
+                TagsInput::make('responsibilities')
+                    ->placeholder('Add responsibility (press Enter)')
                     ->columnSpanFull(),
-                Textarea::make('technologies')
-                    ->default(null)
+                TagsInput::make('technologies')
+                    ->placeholder('Add technology (press Enter)')
                     ->columnSpanFull(),
                 TextInput::make('company_logo')
                     ->default(null),

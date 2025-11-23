@@ -6,6 +6,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -28,15 +29,18 @@ class ProjectForm
                     ->default(null)
                     ->columnSpanFull(),
                 FileUpload::make('image_url')
-                    ->image(),
-                Textarea::make('gallery_images')
-                    ->default(null)
+                    ->image()
+                    ->directory('projects')
+                    ->visibility('public')
+                    ->disk('public'),
+                TagsInput::make('gallery_images')
+                    ->placeholder('Add image URL (press Enter)')
                     ->columnSpanFull(),
-                Textarea::make('technologies')
-                    ->default(null)
+                TagsInput::make('technologies')
+                    ->placeholder('Add technology (press Enter)')
                     ->columnSpanFull(),
-                Textarea::make('features')
-                    ->default(null)
+                TagsInput::make('features')
+                    ->placeholder('Add feature (press Enter)')
                     ->columnSpanFull(),
                 TextInput::make('github_url')
                     ->url()

@@ -16,19 +16,9 @@ class PortfolioDataSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed Profile
-        Profile::create([
-            'full_name' => 'Gagan Kumar',
-            'title' => 'Senior Product Engineer',
-            'bio' => 'Senior Product Engineer focused on building intersectional digital experiences',
-            'summary' => 'I am a Senior Product Engineer focused on building intersectional digital experiences. With a background in architectural design and computer science, I approach frontend development with a spatial mindset. I specialize in high-performance React applications, design systems, and micro-interactions that elevate usability. Currently exploring the boundaries of Generative AI in UI patterns.',
-            'email' => 'contact@gagankumar.dev',
-            'location' => 'San Francisco, CA',
-            'github_url' => 'https://github.com/gagankumar',
-            'linkedin_url' => 'https://linkedin.com/in/gagankumar',
-            'years_of_experience' => 8,
-            'availability_status' => 'available',
-        ]);
+        // Truncate and seed Experience and Project tables
+        Experience::truncate();
+        Project::truncate();
 
         // Seed Experiences
         Experience::create([
@@ -70,29 +60,6 @@ class PortfolioDataSeeder extends Seeder
             'description' => 'Developed award-winning marketing sites for Fortune 500 clients. Bridged the gap between creative direction and technical implementation.',
             'technologies' => ['Vue.js', 'WebGL', 'Three.js', 'GSAP'],
             'display_order' => 3,
-            'is_published' => true,
-        ]);
-
-        // Seed Education
-        Education::create([
-            'institution' => 'Massachusetts Institute of Technology',
-            'degree' => 'B.S. Computer Science',
-            'field_of_study' => 'Computer Science',
-            'start_date' => '2013-09-01',
-            'end_date' => '2017-06-01',
-            'is_current' => false,
-            'display_order' => 1,
-            'is_published' => true,
-        ]);
-
-        Education::create([
-            'institution' => 'Massachusetts Institute of Technology',
-            'degree' => 'Minor in Architectural Design',
-            'field_of_study' => 'Architectural Design',
-            'start_date' => '2013-09-01',
-            'end_date' => '2017-06-01',
-            'is_current' => false,
-            'display_order' => 2,
             'is_published' => true,
         ]);
 
@@ -148,45 +115,5 @@ class PortfolioDataSeeder extends Seeder
             'display_order' => 4,
             'is_published' => true,
         ]);
-
-        // Seed Skills
-        $coreStackSkills = ['React', 'TypeScript', 'Next.js', 'Node.js', 'GraphQL', 'PostgreSQL'];
-        $order = 1;
-        foreach ($coreStackSkills as $skill) {
-            Skill::create([
-                'name' => $skill,
-                'category' => 'Core Stack',
-                'proficiency_level' => 90,
-                'years_of_experience' => 5,
-                'display_order' => $order++,
-                'is_published' => true,
-            ]);
-        }
-
-        $creativeDevSkills = ['Three.js', 'WebGL', 'Framer Motion', 'GSAP', 'D3.js', 'Canvas API'];
-        $order = 1;
-        foreach ($creativeDevSkills as $skill) {
-            Skill::create([
-                'name' => $skill,
-                'category' => 'Creative Dev',
-                'proficiency_level' => 85,
-                'years_of_experience' => 4,
-                'display_order' => $order++,
-                'is_published' => true,
-            ]);
-        }
-
-        $designToolsSkills = ['Figma', 'System Design', 'Jest/Vitest', 'Docker', 'AWS', 'CI/CD'];
-        $order = 1;
-        foreach ($designToolsSkills as $skill) {
-            Skill::create([
-                'name' => $skill,
-                'category' => 'Design & Tools',
-                'proficiency_level' => 80,
-                'years_of_experience' => 3,
-                'display_order' => $order++,
-                'is_published' => true,
-            ]);
-        }
     }
 }
