@@ -1,0 +1,40 @@
+# Ignore vendor directory
+vendor/
+
+# Ignore node_modules
+node_modules/
+
+# Ignore .env files
+.env
+.env.*
+!.env.example
+
+# Ignore storage and cache
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+
+# Keep gitkeep files
+!storage/logs/.gitkeep
+!storage/framework/cache/.gitkeep
+!storage/framework/sessions/.gitkeep
+!storage/framework/views/.gitkeep
+!bootstrap/cache/.gitkeep
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore build artifacts
+*.log
+npm-debug.log*
+
+# Ignore test files
+.phpunit.result.cache
+tests/

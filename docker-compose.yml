@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: portfolio-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-portfolio_db}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME:-portfolio_user}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - portfolio-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Laravel API
+  api:
+    build:
+      context: ./portfolio-api
+      dockerfile: Dockerfile
+    container_name: portfolio-api
+    restart: unless-stopped
+    environment:
+      APP_NAME: "Portfolio API"
+      APP_ENV: production
+      APP_KEY: ${API_APP_KEY}
+      APP_DEBUG: "false"
+      APP_URL: ${API_URL:-http://localhost:8000}
+      
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-portfolio_db}
+      DB_USERNAME: ${DB_USERNAME:-portfolio_user}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      
+      CACHE_STORE: database
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: database
+      
+      LOG_CHANNEL: stderr
+    ports:
+      - "8000:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+    volumes:
+      - ./portfolio-api/storage:/var/www/html/storage
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./portfolio-frontend
+      dockerfile: Dockerfile
+    container_name: portfolio-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api}
+      VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-15000}
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - portfolio-network
+
+networks:
+  portfolio-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

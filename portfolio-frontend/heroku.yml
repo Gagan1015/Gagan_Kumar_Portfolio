@@ -1,0 +1,4 @@
+# Heroku build configuration for container deployment
+build:
+  docker:
+    web: Dockerfile
