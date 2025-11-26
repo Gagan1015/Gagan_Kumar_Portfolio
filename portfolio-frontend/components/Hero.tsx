@@ -217,15 +217,28 @@ export const Hero: React.FC = () => {
               <span className="relative z-10 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">View Selected Work</span>
               <div className="absolute inset-0 bg-white dark:bg-black transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
             </button>
-            <a 
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-4 bg-transparent text-black dark:text-white border border-neutral-300 dark:border-neutral-700 font-mono text-sm tracking-widest uppercase hover:border-black dark:hover:border-white transition-colors duration-300 flex items-center gap-2"
-            >
-              Github
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-            </a>
+            {profile?.resume_url ? (
+              <a 
+                href={profile.resume_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 bg-transparent text-black dark:text-white border border-neutral-300 dark:border-neutral-700 font-mono text-sm tracking-widest uppercase hover:border-black dark:hover:border-white transition-colors duration-300 flex items-center gap-2"
+              >
+                View Resume
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            ) : (
+              <button 
+                disabled
+                className="px-8 py-4 bg-transparent text-neutral-400 dark:text-neutral-600 border border-neutral-200 dark:border-neutral-800 font-mono text-sm tracking-widest uppercase cursor-not-allowed flex items-center gap-2"
+              >
+                Resume Not Available
+              </button>
+            )}
           </div>
 
           {/* Static Contact Info Grid */}

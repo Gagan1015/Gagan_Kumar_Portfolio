@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EducationController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\ResumeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,30 @@ use App\Http\Controllers\Api\SettingController;
 
 // Profile endpoint (single resource)
 Route::get('/profile', [ProfileController::class, 'index']);
+
+// Resume download endpoint
+Route::get('/resume/download', [ResumeController::class, 'download']);
+
+// Debug endpoint - remove after testing
+Route::get('/resume/debug', function() {
+    $profile = \App\Models\Profile::first();
+    if (!$profile) {
+        return response()->json(['message' => 'No profile found'], 404);
+    }
+    
+    $cloudName = config('filesystems.disks.cloudinary.cloud');
+    $resumePath = $profile->resume_url;
+    $cleanPath = ltrim($resumePath, '/');
+    $constructedUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/{$cleanPath}.pdf";
+    
+    return response()->json([
+        'raw_resume_url' => $resumePath,
+        'cloud_name' => $cloudName,
+        'clean_path' => $cleanPath,
+        'constructed_url' => $constructedUrl,
+        'note' => 'Path stored WITHOUT .pdf extension, added when building URL'
+    ]);
+});
 
 // Experience endpoints
 Route::get('/experiences', [ExperienceController::class, 'index']);

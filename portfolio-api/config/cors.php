@@ -24,7 +24,9 @@ return [
         'http://localhost:3000',
         'http://127.0.0.1:5173',
         'http://127.0.0.1:3000',
-        env('FRONTEND_URL', 'https://gagan-portfolio-frontend-b70109545d30.herokuapp.com'),
+        'https://www.gagankumar.me',
+        'https://gagankumar.me',
+        'https://gagan-portfolio-frontend-b70109545d30.herokuapp.com',
     ],
 
     'allowed_origins_patterns' => [],

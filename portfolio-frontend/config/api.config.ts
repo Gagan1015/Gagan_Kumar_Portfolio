@@ -24,4 +24,5 @@ export const API_ENDPOINTS = {
   projects: '/projects',
   skills: '/skills',
   settings: '/settings',
+  resumeDownload: '/resume/download',
 } as const;

@@ -29,10 +29,15 @@ class ProjectForm
                     ->default(null)
                     ->columnSpanFull(),
                 FileUpload::make('image_url')
+                    ->label('Project Image')
                     ->image()
                     ->directory('projects')
+                    ->disk('cloudinary')
                     ->visibility('public')
-                    ->disk('public'),
+                    ->imageEditor()
+                    ->maxSize(5120) // 5MB
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+                    ->helperText('Upload a project image (max 5MB)'),
                 TagsInput::make('gallery_images')
                     ->placeholder('Add image URL (press Enter)')
                     ->columnSpanFull(),

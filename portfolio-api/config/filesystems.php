@@ -62,6 +62,14 @@ return [
 
         'cloudinary' => [
             'driver' => 'cloudinary',
+            'cloud' => env('CLOUDINARY_CLOUD_NAME'),
+            'key' => env('CLOUDINARY_API_KEY'),
+            'secret' => env('CLOUDINARY_API_SECRET'),
+            'secure' => env('CLOUDINARY_SECURE', true),
+            'url_prefix' => env('CLOUDINARY_URL_PREFIX'),
+            'options' => [
+                'resource_type' => 'auto', // auto-detect resource type
+            ],
         ],
 
     ],

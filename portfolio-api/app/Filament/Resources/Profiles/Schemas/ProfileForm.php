@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Profiles\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -34,9 +35,18 @@ class ProfileForm
                     ->default(null),
                 TextInput::make('avatar')
                     ->default(null),
-                TextInput::make('resume_url')
-                    ->url()
-                    ->default(null),
+                FileUpload::make('resume_url')
+                    ->label('Resume')
+                    ->disk('cloudinary')
+                    ->directory('resumes')
+                    ->visibility('public')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->maxSize(10240) // 10MB
+                    ->downloadable()
+                    ->getUploadedFileNameForStorageUsing(
+                        fn ($file): string => 'Gagan_Kumar_Resume',
+                    )
+                    ->helperText('Upload your resume (PDF only, max 10MB)'),
                 TextInput::make('github_url')
                     ->url()
                     ->default(null),
