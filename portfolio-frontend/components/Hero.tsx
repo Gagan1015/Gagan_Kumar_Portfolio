@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SectionId } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
+import { resumeService } from '../services/portfolioService';
 
 const CODE_TABS = [
   {
@@ -154,7 +155,7 @@ export const Hero: React.FC = () => {
   };
 
   return (
-    <section id={SectionId.Hero} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white dark:bg-geo-dark-bg pt-20 md:pt-0 transition-colors duration-300">
+    <section id={SectionId.Hero} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white dark:bg-geo-dark-bg pt-24 transition-colors duration-300">
       {/* Dynamic Background Grid */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]" 
         style={{ 
@@ -217,6 +218,22 @@ export const Hero: React.FC = () => {
               <span className="relative z-10 group-hover:text-black dark:group-hover:text-white transition-colors duration-300">View Selected Work</span>
               <div className="absolute inset-0 bg-white dark:bg-black transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
             </button>
+            {profile?.resume_url && (
+              <button 
+                onClick={() => resumeService.download()}
+                className="group relative px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-mono text-sm tracking-widest uppercase overflow-hidden border border-black dark:border-white"
+              >
+                <span className="relative z-10 group-hover:text-black dark:group-hover:text-white transition-colors duration-300 flex items-center gap-2">
+                  Download Resume
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-white dark:bg-black transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+              </button>
+            )}
             {profile?.github_url && (
               <a 
                 href={profile.github_url}

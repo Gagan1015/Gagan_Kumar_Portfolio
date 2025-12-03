@@ -1,6 +1,16 @@
 import { apiClient } from './api';
-import { API_ENDPOINTS } from '../config/api.config';
+import { API_ENDPOINTS, API_CONFIG } from '../config/api.config';
 import { Profile, Experience, Education, Project, Skill } from '../types';
+
+// Resume Service
+export const resumeService = {
+  download: async (): Promise<void> => {
+    const downloadUrl = `${API_CONFIG.baseURL}${API_ENDPOINTS.resumeDownload}`;
+    
+    // Open in new tab to trigger browser download
+    window.open(downloadUrl, '_blank');
+  },
+};
 
 // Profile Service
 export const profileService = {

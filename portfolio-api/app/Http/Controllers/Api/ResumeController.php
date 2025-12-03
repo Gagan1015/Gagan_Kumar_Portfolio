@@ -6,9 +6,51 @@ use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ResumeController extends Controller
 {
+    /**
+     * Upload resume PDF to Cloudinary (for admin use)
+     */
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'resume' => 'required|file|mimes:pdf|max:10240', // 10MB max
+        ]);
+
+        try {
+            $file = $request->file('resume');
+            
+            // Upload to Cloudinary with resource_type: raw for PDFs
+            $result = Cloudinary::uploadFile($file->getRealPath(), [
+                'folder' => 'resumes',
+                'public_id' => 'Gagan_Kumar_Resume_' . now()->timestamp,
+                'resource_type' => 'raw',
+            ]);
+            
+            $publicId = $result->getPublicId();
+            
+            // Update profile with new resume path
+            $profile = Profile::first();
+            if ($profile) {
+                $profile->resume_url = $publicId . '.pdf';
+                $profile->save();
+            }
+            
+            return response()->json([
+                'message' => 'Resume uploaded successfully',
+                'path' => $publicId . '.pdf',
+                'url' => $result->getSecurePath(),
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Upload failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Download the resume PDF file.
      */

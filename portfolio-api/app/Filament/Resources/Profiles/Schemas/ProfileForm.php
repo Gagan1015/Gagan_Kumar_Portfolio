@@ -36,10 +36,9 @@ class ProfileForm
                 TextInput::make('avatar')
                     ->default(null),
                 TextInput::make('resume_url')
-                    ->label('Resume URL')
-                    ->url()
-                    ->default(null)
-                    ->helperText('Direct URL to your resume PDF'),
+                    ->label('Resume URL (Cloudinary Path)')
+                    ->helperText('Enter the Cloudinary path for your resume PDF (e.g., resumes/filename.pdf)')
+                    ->columnSpanFull(),
                 TextInput::make('github_url')
                     ->url()
                     ->default(null),

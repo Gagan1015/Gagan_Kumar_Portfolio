@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { SectionId, Theme } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
+import { resumeService } from '../services/portfolioService';
 
 interface HeaderProps {
   activeSection: string;
@@ -90,6 +91,20 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
             ))}
           </nav>
 
+          {profile?.resume_url && (
+            <button
+              onClick={() => resumeService.download()}
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-mono text-xs tracking-widest uppercase hover:opacity-80 transition-opacity"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Resume
+            </button>
+          )}
+
           <button 
             onClick={onToggleTheme}
             className="w-8 h-8 flex items-center justify-center border border-neutral-200 dark:border-geo-dark-border rounded hover:bg-neutral-100 dark:hover:bg-geo-dark-card transition-colors text-black dark:text-white"
@@ -132,12 +147,12 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
             className={`fixed top-0 right-0 h-full w-64 bg-white dark:bg-geo-dark-bg border-l border-neutral-200 dark:border-geo-dark-border z-[101] md:hidden transform transition-transform duration-300 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
           >
             <div className="pt-20 px-6">
-              <nav className="flex flex-col gap-4">
+              <nav className="flex flex-col gap-1">
                 {navItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => scrollTo(item.id)}
-                    className={`text-left text-lg font-medium uppercase tracking-wider transition-colors py-2 border-b border-neutral-100 dark:border-geo-dark-border
+                    className={`text-left text-lg font-medium uppercase tracking-wider transition-colors py-3
                       ${activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
                     `}
                   >
@@ -146,7 +161,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
                 ))}
               </nav>
 
-              <div className="mt-8 pt-4 border-t border-neutral-200 dark:border-geo-dark-border">
+              <div className="mt-6 pt-6 border-t border-neutral-200/50 dark:border-geo-dark-border/50 flex flex-col gap-4">
                 <button 
                   onClick={onToggleTheme}
                   className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
@@ -164,6 +179,23 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
                     {theme === 'light' ? 'Light Mode' : theme === 'dark' ? 'Dark Mode' : 'System'}
                   </span>
                 </button>
+
+                {profile?.resume_url && (
+                  <button
+                    onClick={() => {
+                      resumeService.download();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span className="text-sm uppercase tracking-wider">Download Resume</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

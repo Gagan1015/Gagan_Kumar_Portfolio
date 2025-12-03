@@ -24,8 +24,9 @@ use App\Http\Controllers\Api\ResumeController;
 // Profile endpoint (single resource)
 Route::get('/profile', [ProfileController::class, 'index']);
 
-// Resume download endpoint
+// Resume endpoints
 Route::get('/resume/download', [ResumeController::class, 'download']);
+Route::post('/resume/upload', [ResumeController::class, 'upload']);
 
 // Debug endpoint - remove after testing
 Route::get('/resume/debug', function() {
