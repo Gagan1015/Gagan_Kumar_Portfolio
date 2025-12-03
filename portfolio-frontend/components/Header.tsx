@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SectionId, Theme } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
 
@@ -11,6 +12,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTheme }) => {
   const { data: profile } = useProfile();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,11 +22,35 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+    setIsMobileMenuOpen(false);
   };
 
   const navItems = [
@@ -36,6 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
   ];
 
   return (
+    <>
     <header className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isScrolled ? 'bg-white/90 dark:bg-geo-dark-bg/90 backdrop-blur-md border-b border-neutral-200 dark:border-geo-dark-border py-3' : 'bg-transparent py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
         <div 
@@ -81,13 +108,68 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
 
           <button 
              className="md:hidden p-2 text-black dark:text-white"
-             onClick={() => {/* Simple mobile menu placeholder could go here */}}
+             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+             aria-label="Toggle mobile menu"
           >
-            <div className="w-6 h-[2px] bg-current mb-1.5"></div>
-            <div className="w-6 h-[2px] bg-current"></div>
+            <div className={`w-6 h-[2px] bg-current transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-[5px]' : 'mb-1.5'}`}></div>
+            <div className={`w-6 h-[2px] bg-current transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-[3px]' : ''}`}></div>
           </button>
         </div>
       </div>
     </header>
+
+    {/* Mobile Menu - Rendered via Portal to avoid stacking context issues */}
+    {createPortal(
+        <>
+          {/* Mobile Menu Overlay */}
+          <div 
+            className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          {/* Mobile Menu Panel */}
+          <div 
+            className={`fixed top-0 right-0 h-full w-64 bg-white dark:bg-geo-dark-bg border-l border-neutral-200 dark:border-geo-dark-border z-[101] md:hidden transform transition-transform duration-300 ease-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+          >
+            <div className="pt-20 px-6">
+              <nav className="flex flex-col gap-4">
+                {navItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => scrollTo(item.id)}
+                    className={`text-left text-lg font-medium uppercase tracking-wider transition-colors py-2 border-b border-neutral-100 dark:border-geo-dark-border
+                      ${activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
+                    `}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+
+              <div className="mt-8 pt-4 border-t border-neutral-200 dark:border-geo-dark-border">
+                <button 
+                  onClick={onToggleTheme}
+                  className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
+                >
+                  {theme === 'light' && (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                  )}
+                  {theme === 'dark' && (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                  )}
+                  {theme === 'system' && (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  )}
+                  <span className="text-sm uppercase tracking-wider">
+                    {theme === 'light' ? 'Light Mode' : theme === 'dark' ? 'Dark Mode' : 'System'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+    </>
   );
 };

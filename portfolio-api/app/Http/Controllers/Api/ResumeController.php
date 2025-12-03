@@ -27,19 +27,18 @@ class ResumeController extends Controller
             
             $cloudName = config('filesystems.disks.cloudinary.cloud');
             
-            // Remove leading slash - stored path won't have .pdf extension
+            // Use stored path as-is (includes .pdf extension)
             $cleanPath = ltrim($resumePath, '/');
             
             // Build the proper Cloudinary URL for raw resources (PDFs)
-            // Format: https://res.cloudinary.com/{cloud_name}/raw/upload/{path}.pdf
-            $publicUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/fl_attachment/{$cleanPath}.pdf";
+            $publicUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/fl_attachment/{$cleanPath}";
             
             // Download the file from the public URL
             $fileResponse = Http::timeout(30)->get($publicUrl);
             
             if (!$fileResponse->successful()) {
                 // Try without fl_attachment flag
-                $publicUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/{$cleanPath}.pdf";
+                $publicUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/{$cleanPath}";
                 $fileResponse = Http::timeout(30)->get($publicUrl);
                 
                 if (!$fileResponse->successful()) {

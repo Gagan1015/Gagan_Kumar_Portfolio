@@ -21,11 +21,11 @@ class ProfileResource extends JsonResource
             $secure = config('filesystems.disks.cloudinary.secure', true);
             $protocol = $secure ? 'https' : 'http';
             
-            // Remove leading slash - stored path won't have .pdf extension
+            // Use stored path as-is (includes .pdf extension)
             $resumePath = ltrim($resumeUrl, '/');
             
-            // Build URL with .pdf extension for raw resource type
-            $resumeUrl = "{$protocol}://res.cloudinary.com/{$cloudName}/raw/upload/{$resumePath}.pdf";
+            // Build URL for raw resource type
+            $resumeUrl = "{$protocol}://res.cloudinary.com/{$cloudName}/raw/upload/{$resumePath}";
         }
 
         return [

@@ -35,18 +35,11 @@ class ProfileForm
                     ->default(null),
                 TextInput::make('avatar')
                     ->default(null),
-                FileUpload::make('resume_url')
-                    ->label('Resume')
-                    ->disk('cloudinary')
-                    ->directory('resumes')
-                    ->visibility('public')
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->maxSize(10240) // 10MB
-                    ->downloadable()
-                    ->getUploadedFileNameForStorageUsing(
-                        fn ($file): string => 'Gagan_Kumar_Resume',
-                    )
-                    ->helperText('Upload your resume (PDF only, max 10MB)'),
+                TextInput::make('resume_url')
+                    ->label('Resume URL')
+                    ->url()
+                    ->default(null)
+                    ->helperText('Direct URL to your resume PDF'),
                 TextInput::make('github_url')
                     ->url()
                     ->default(null),

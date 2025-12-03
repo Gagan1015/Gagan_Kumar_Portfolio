@@ -37,14 +37,14 @@ Route::get('/resume/debug', function() {
     $cloudName = config('filesystems.disks.cloudinary.cloud');
     $resumePath = $profile->resume_url;
     $cleanPath = ltrim($resumePath, '/');
-    $constructedUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/{$cleanPath}.pdf";
+    $constructedUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/{$cleanPath}";
     
     return response()->json([
         'raw_resume_url' => $resumePath,
         'cloud_name' => $cloudName,
         'clean_path' => $cleanPath,
         'constructed_url' => $constructedUrl,
-        'note' => 'Path stored WITHOUT .pdf extension, added when building URL'
+        'note' => 'Path stored WITH .pdf extension, used as-is'
     ]);
 });
 
