@@ -61,8 +61,8 @@ export const Projects: React.FC = () => {
                   />
                   <div className="absolute inset-0 border-[1px] border-transparent group-hover:border-white/20 transition-all duration-300 m-4 pointer-events-none"></div>
                   {project.website_url && (
-                    <div className="absolute top-4 right-4 bg-black/50 dark:bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute top-4 right-4 bg-black/50 dark:bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <svg className="w-4 h-4 text-white dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
                     </div>
