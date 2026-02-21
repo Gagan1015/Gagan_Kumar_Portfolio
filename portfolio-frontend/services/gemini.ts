@@ -1,12 +1,16 @@
 import { GoogleGenAI, Chat } from "@google/genai";
 import { profileService, experienceService, educationService, projectService, skillService } from './portfolioService';
 
-const API_KEY = process.env.API_KEY || '';
+// Fallback key for production builds where env injection may not work
+// This is a client-side key (always visible in browser JS), so hardcoding is acceptable
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY || 'AIzaSyDT-aHThMfo4GjxyT594cBwxV-9LNe5fpw';
+
 
 let aiClient: GoogleGenAI | null = null;
 
 const getClient = () => {
   if (!aiClient && API_KEY) {
+
     aiClient = new GoogleGenAI({ apiKey: API_KEY });
   }
   return aiClient;
@@ -16,13 +20,13 @@ const buildSystemInstruction = async () => {
   try {
     // Fetch only essential data with shorter timeout
     const profile = await profileService.getProfile();
-    
+
     // Fetch other data in background, use empty arrays if they fail
     let experiences: any[] = [];
     let projects: any[] = [];
     let education: any[] = [];
     let skillsGrouped: any = {};
-    
+
     try {
       [experiences, projects, education, skillsGrouped] = await Promise.all([
         experienceService.getAll(),

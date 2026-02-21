@@ -1,6 +1,10 @@
 # Multi-stage build for React Frontend
 FROM node:20-alpine AS builder
 
+# Accept GEMINI_API_KEY as a build argument (default for Heroku git push builds)
+ARG GEMINI_API_KEY=AIzaSyDT-aHThMfo4GjxyT594cBwxV-9LNe5fpw
+ENV GEMINI_API_KEY=${GEMINI_API_KEY}
+
 # Set working directory
 WORKDIR /app
 
@@ -13,7 +17,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
+# Ensure GEMINI_API_KEY is available to Vite during build
+# Create .env file so loadEnv can find it regardless of .dockerignore
+RUN echo "GEMINI_API_KEY=${GEMINI_API_KEY}" > .env
+
+# Build the application (Vite will pick up GEMINI_API_KEY from .env)
 RUN npm run build
 
 # Production stage with Nginx

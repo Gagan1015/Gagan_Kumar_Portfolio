@@ -67,7 +67,7 @@ export const AIChat: React.FC = () => {
     }
   };
 
-  if (!process.env.API_KEY) return null;
+  // Chat is always available (API key has hardcoded fallback in gemini.ts)
 
   return (
     <>

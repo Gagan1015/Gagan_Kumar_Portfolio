@@ -2,3 +2,5 @@
 build:
   docker:
     web: Dockerfile
+  config:
+    GEMINI_API_KEY: AIzaSyDT-aHThMfo4GjxyT594cBwxV-9LNe5fpw
