@@ -1,12 +1,13 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { 
-  profileService, 
-  experienceService, 
-  educationService, 
-  projectService, 
-  skillService 
+import {
+  profileService,
+  experienceService,
+  educationService,
+  projectService,
+  skillService,
+  blogService
 } from '../services/portfolioService';
-import { Profile, Experience, Education, Project, Skill } from '../types';
+import { Profile, Experience, Education, Project, Skill, BlogPost } from '../types';
 
 // Profile Hook
 export const useProfile = (): UseQueryResult<Profile, Error> => {
@@ -56,6 +57,16 @@ export const useProjects = (params?: { category?: string; featured?: boolean }):
   });
 };
 
+export const useProject = (id: string): UseQueryResult<Project, Error> => {
+  return useQuery({
+    queryKey: ['project', id],
+    queryFn: () => projectService.getById(id),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: !!id,
+  });
+};
+
 // Skills Hook
 export const useSkills = (params?: { category?: string; grouped?: boolean }): UseQueryResult<Skill[] | Record<string, Skill[]>, Error> => {
   return useQuery({
@@ -75,5 +86,49 @@ export const useSkillsGrouped = (): UseQueryResult<Record<string, Skill[]>, Erro
     gcTime: 10 * 60 * 1000,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+  });
+};
+
+// Blog Hooks
+export const useBlogs = (params?: { category?: string; tag?: string; page?: number; per_page?: number }): UseQueryResult<{ data: BlogPost[]; meta: any }, Error> => {
+  return useQuery({
+    queryKey: ['blogs', params],
+    queryFn: () => blogService.getAll(params),
+    staleTime: 0,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const useBlogPost = (slug: string): UseQueryResult<BlogPost, Error> => {
+  return useQuery({
+    queryKey: ['blog', slug],
+    queryFn: () => blogService.getBySlug(slug),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    enabled: !!slug,
+  });
+};
+
+export const useFeaturedBlogs = (limit?: number): UseQueryResult<BlogPost[], Error> => {
+  return useQuery({
+    queryKey: ['blogs', 'featured', limit],
+    queryFn: () => blogService.getFeatured(limit),
+    staleTime: 0,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const useBlogCategories = (): UseQueryResult<string[], Error> => {
+  return useQuery({
+    queryKey: ['blogs', 'categories'],
+    queryFn: blogService.getCategories,
+    staleTime: 0,
+    gcTime: 15 * 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 };

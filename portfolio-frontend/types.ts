@@ -83,6 +83,27 @@ export interface Skill {
   description: string | null;
 }
 
+export interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  featured_image: string | null;
+  category: string | null;
+  tags: string[] | null;
+  reading_time: number | null;
+  is_featured: boolean;
+  published_at: string | null;
+  formatted_date: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  meta_keywords: string | null;
+  og_image: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // UI Types
 export enum SectionId {
   Hero = 'hero',
@@ -91,6 +112,7 @@ export enum SectionId {
   Projects = 'projects',
   Skills = 'skills',
   Education = 'education',
+  Blog = 'blog',
 }
 
 export interface ChatMessage {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SectionId } from '../types';
 import { useProjects } from '../hooks/usePortfolio';
+import { Link } from 'react-router-dom';
 
 export const Projects: React.FC = () => {
   const { data: projects, isLoading, error } = useProjects();
@@ -87,9 +88,21 @@ export const Projects: React.FC = () => {
             </p>
           </div>
           <div className="md:col-span-7 md:flex md:items-end md:justify-end">
-            <p className="text-neutral-500 dark:text-neutral-400 text-lg leading-relaxed md:text-right max-w-md">
-              A curation of digital products, websites, and experimental interfaces.
-            </p>
+            <div className="md:text-right">
+              <p className="text-neutral-500 dark:text-neutral-400 text-lg leading-relaxed md:max-w-md">
+                A curation of digital products, websites, and experimental interfaces.
+              </p>
+              <Link
+                to="/projects"
+                className="inline-flex items-center gap-2 mt-6 text-xs font-mono uppercase tracking-widest text-black dark:text-white hover:opacity-70 transition-opacity"
+              >
+                Explore all projects
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
 

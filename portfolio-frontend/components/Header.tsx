@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SectionId, Theme } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
 import { resumeService } from '../services/portfolioService';
@@ -46,20 +47,36 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
     };
   }, [isMobileMenuOpen]);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isOnBlogPage = location.pathname.startsWith('/blog');
+  const isOnProjectsPage = location.pathname.startsWith('/projects');
+
   const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (isOnBlogPage || isOnProjectsPage) {
+      // Navigate home first, then scroll
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
     setIsMobileMenuOpen(false);
   };
 
+  const goToRoute = (route: string) => {
+    navigate(route);
+    setIsMobileMenuOpen(false);
+  };
+
   const navItems = [
-    { id: SectionId.Profile, label: 'About' },
-    { id: SectionId.Experience, label: 'Experience' },
-    { id: SectionId.Skills, label: 'Skills' },
-    { id: SectionId.Projects, label: 'Projects' },
-    { id: SectionId.Education, label: 'Education' },
+    { id: 'projects', label: 'Projects', route: '/projects' },
+    { id: 'blog', label: 'Blog', route: '/blog' },
   ];
 
   return (
@@ -68,7 +85,13 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
         <div 
           className="font-display font-bold text-xl tracking-tighter cursor-pointer select-none hover:opacity-60 transition-opacity dark:text-white"
-          onClick={() => scrollTo(SectionId.Hero)}
+          onClick={() => {
+            if (isOnBlogPage || isOnProjectsPage) {
+              navigate('/');
+            } else {
+              scrollTo(SectionId.Hero);
+            }
+          }}
         >
           {profile?.full_name?.toUpperCase() || 'LOADING...'}
         </div>
@@ -78,13 +101,13 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollTo(item.id)}
+                onClick={() => goToRoute(item.route)}
                 className={`text-sm font-medium uppercase tracking-wider transition-colors relative
-                  ${activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
+                  ${location.pathname.startsWith(item.route) || activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
                 `}
               >
                 {item.label}
-                {activeSection === item.id && (
+                {(location.pathname.startsWith(item.route) || activeSection === item.id) && (
                   <span className="absolute -bottom-1 left-0 w-full h-[1px] bg-black dark:bg-white"></span>
                 )}
               </button>
@@ -151,9 +174,9 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
                 {navItems.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => scrollTo(item.id)}
+                    onClick={() => goToRoute(item.route)}
                     className={`text-left text-lg font-medium uppercase tracking-wider transition-colors py-3
-                      ${activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
+                      ${location.pathname.startsWith(item.route) || activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
                     `}
                   >
                     {item.label}

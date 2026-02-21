@@ -25,4 +25,7 @@ export const API_ENDPOINTS = {
   skills: '/skills',
   settings: '/settings',
   resumeDownload: '/resume/download',
+  blog: '/blog',
+  blogFeatured: '/blog/featured',
+  blogCategories: '/blog/categories',
 } as const;

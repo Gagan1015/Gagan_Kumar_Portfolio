@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ResumeController;
+use App\Http\Controllers\Api\BlogPostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,3 +69,10 @@ Route::get('/skills/{id}', [SkillController::class, 'show']);
 // Settings endpoints
 Route::get('/settings', [SettingController::class, 'index']);
 Route::get('/settings/{key}', [SettingController::class, 'show']);
+
+// Blog endpoints (order matters: specific routes before wildcard {slug})
+Route::get('/blog', [BlogPostController::class, 'index']);
+Route::get('/blog/featured', [BlogPostController::class, 'featured']);
+Route::get('/blog/categories', [BlogPostController::class, 'categories']);
+Route::get('/blog/{slug}', [BlogPostController::class, 'show']);
+
