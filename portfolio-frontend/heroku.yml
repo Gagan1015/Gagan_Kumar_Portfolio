@@ -1,6 +1,0 @@
-# Heroku build configuration for container deployment
-build:
-  docker:
-    web: Dockerfile
-  config:
-    GEMINI_API_KEY: AIzaSyCAPBUBPk_5TvOJKv2-4wskC8P9Vj1FYLc
