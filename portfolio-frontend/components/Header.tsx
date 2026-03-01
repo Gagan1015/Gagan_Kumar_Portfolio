@@ -103,11 +103,11 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
                 key={item.id}
                 onClick={() => goToRoute(item.route)}
                 className={`text-sm font-medium uppercase tracking-wider transition-colors relative
-                  ${location.pathname.startsWith(item.route) || activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
+                  ${location.pathname.startsWith(item.route) ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
                 `}
               >
                 {item.label}
-                {(location.pathname.startsWith(item.route) || activeSection === item.id) && (
+                {location.pathname.startsWith(item.route) && (
                   <span className="absolute -bottom-1 left-0 w-full h-[1px] bg-black dark:bg-white"></span>
                 )}
               </button>
@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
                     key={item.id}
                     onClick={() => goToRoute(item.route)}
                     className={`text-left text-lg font-medium uppercase tracking-wider transition-colors py-3
-                      ${location.pathname.startsWith(item.route) || activeSection === item.id ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
+                      ${location.pathname.startsWith(item.route) ? 'text-black dark:text-white' : 'text-neutral-400 hover:text-black dark:hover:text-white'}
                     `}
                   >
                     {item.label}

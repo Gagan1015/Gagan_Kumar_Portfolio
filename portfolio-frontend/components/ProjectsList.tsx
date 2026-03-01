@@ -2,6 +2,37 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProjects } from '../hooks/usePortfolio';
 
+// Bento grid layout patterns — each pattern defines spans for a row of cards
+// [colSpan, rowSpan] pairs — designed for a 12-column grid
+const BENTO_PATTERNS = [
+  // Pattern 0: Large hero (8) + tall side (4)
+  [
+    { col: 'md:col-span-8', row: 'md:row-span-2', aspect: 'aspect-[16/9] md:aspect-auto md:h-full', size: 'hero' },
+    { col: 'md:col-span-4', row: 'md:row-span-2', aspect: 'aspect-[4/3] md:aspect-auto md:h-full', size: 'tall' },
+  ],
+  // Pattern 1: Three equal columns
+  [
+    { col: 'md:col-span-4', row: 'md:row-span-1', aspect: 'aspect-[4/3]', size: 'standard' },
+    { col: 'md:col-span-4', row: 'md:row-span-1', aspect: 'aspect-[4/3]', size: 'standard' },
+    { col: 'md:col-span-4', row: 'md:row-span-1', aspect: 'aspect-[4/3]', size: 'standard' },
+  ],
+  // Pattern 2: Side (4) + Large hero (8)
+  [
+    { col: 'md:col-span-4', row: 'md:row-span-2', aspect: 'aspect-[4/3] md:aspect-auto md:h-full', size: 'tall' },
+    { col: 'md:col-span-8', row: 'md:row-span-2', aspect: 'aspect-[16/9] md:aspect-auto md:h-full', size: 'hero' },
+  ],
+  // Pattern 3: Two equal halves
+  [
+    { col: 'md:col-span-6', row: 'md:row-span-1', aspect: 'aspect-[16/10]', size: 'wide' },
+    { col: 'md:col-span-6', row: 'md:row-span-1', aspect: 'aspect-[16/10]', size: 'wide' },
+  ],
+  // Pattern 4: Wide (7) + Narrow (5)
+  [
+    { col: 'md:col-span-7', row: 'md:row-span-1', aspect: 'aspect-[16/9]', size: 'wide' },
+    { col: 'md:col-span-5', row: 'md:row-span-1', aspect: 'aspect-[4/3]', size: 'standard' },
+  ],
+];
+
 export const ProjectsList: React.FC = () => {
   const { data: projects, isLoading, error } = useProjects();
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
@@ -19,6 +50,26 @@ export const ProjectsList: React.FC = () => {
     if (!selectedCategory) return projects;
     return projects.filter((project) => project.category === selectedCategory);
   }, [projects, selectedCategory]);
+
+  // Distribute projects into bento layout groups
+  const bentoGroups = useMemo(() => {
+    const groups: { pattern: typeof BENTO_PATTERNS[number]; projects: typeof filteredProjects }[] = [];
+    let index = 0;
+    let patternIndex = 0;
+
+    while (index < filteredProjects.length) {
+      const pattern = BENTO_PATTERNS[patternIndex % BENTO_PATTERNS.length];
+      const count = Math.min(pattern.length, filteredProjects.length - index);
+      groups.push({
+        pattern: pattern.slice(0, count),
+        projects: filteredProjects.slice(index, index + count),
+      });
+      index += count;
+      patternIndex++;
+    }
+
+    return groups;
+  }, [filteredProjects]);
 
   useEffect(() => {
     document.title = 'Projects | Gagan Kumar';
@@ -43,7 +94,7 @@ export const ProjectsList: React.FC = () => {
             observer.disconnect();
           }
         },
-        { threshold: 0.1 }
+        { threshold: 0.08 }
       );
       observer.observe(el);
       observers.push(observer);
@@ -56,9 +107,12 @@ export const ProjectsList: React.FC = () => {
     setVisibleCards(new Set());
   }, [selectedCategory]);
 
+  let globalIndex = 0;
+
   return (
     <div className="projects-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-28 md:pt-32">
+      {/* Back link */}
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 pt-28 md:pt-32">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 group"
@@ -71,34 +125,36 @@ export const ProjectsList: React.FC = () => {
         </Link>
       </div>
 
-      <div className={`max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-16 transition-all duration-700 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-6">
-            <h1 className="font-display text-4xl md:text-5xl font-medium tracking-tight text-black dark:text-white">
-              PROJECTS<span className="text-neutral-300 dark:text-neutral-700">.</span>
-            </h1>
-            <div className="h-px w-12 bg-black dark:bg-white mt-4" />
-            <p className="text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600 mt-4">
+      {/* Header Section */}
+      <div className={`max-w-[1400px] mx-auto px-6 md:px-12 pt-12 pb-10 transition-all duration-700 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+          <div className="md:col-span-7">
+            <p className="text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600 mb-4">
               {filteredProjects.length} {filteredProjects.length === 1 ? 'Project' : 'Projects'}
             </p>
+            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tighter text-black dark:text-white leading-[0.9]">
+              ALL<br/>PROJECTS<span className="text-neutral-300 dark:text-neutral-700">.</span>
+            </h1>
           </div>
-          <div className="md:col-span-6 md:flex md:items-end md:justify-end">
-            <p className="text-neutral-500 dark:text-neutral-400 text-lg leading-relaxed md:text-right max-w-md">
-              Deep dives into products I have designed, built, and shipped across web and mobile.
+          <div className="md:col-span-5 md:flex md:items-end md:justify-end pb-2">
+            <p className="text-neutral-500 dark:text-neutral-400 text-base leading-relaxed md:text-right max-w-sm">
+              Deep dives into products I have designed, built, and shipped across web and mobile platforms.
             </p>
           </div>
         </div>
+        <div className="h-px bg-neutral-200 dark:bg-neutral-800 mt-10" />
       </div>
 
+      {/* Category Filters */}
       {categories.length > 0 && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-12">
-          <div className="flex items-center gap-1 overflow-x-auto pb-2">
+        <div className={`max-w-[1400px] mx-auto px-6 md:px-12 pb-10 transition-all duration-700 delay-200 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setSelectedCategory(undefined)}
-              className={`px-4 py-2 text-xs font-mono uppercase tracking-widest border transition-colors ${
+              className={`px-5 py-2.5 text-[11px] font-mono uppercase tracking-[0.15em] border transition-all duration-300 whitespace-nowrap ${
                 !selectedCategory
-                  ? 'border-black dark:border-white text-black dark:text-white'
-                  : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 dark:text-neutral-600 hover:text-black dark:hover:text-white'
+                  ? 'border-black dark:border-white text-black dark:text-white bg-black dark:bg-white text-white dark:text-black'
+                  : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 dark:text-neutral-600 hover:text-black dark:hover:text-white hover:border-neutral-400 dark:hover:border-neutral-600'
               }`}
             >
               All
@@ -107,39 +163,41 @@ export const ProjectsList: React.FC = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 text-xs font-mono uppercase tracking-widest border transition-colors ${
+                className={`px-5 py-2.5 text-[11px] font-mono uppercase tracking-[0.15em] border transition-all duration-300 whitespace-nowrap ${
                   selectedCategory === category
-                    ? 'border-black dark:border-white text-black dark:text-white'
-                    : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 dark:text-neutral-600 hover:text-black dark:hover:text-white'
+                    ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
+                    : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 dark:text-neutral-600 hover:text-black dark:hover:text-white hover:border-neutral-400 dark:hover:border-neutral-600'
                 }`}
               >
                 {category}
               </button>
             ))}
           </div>
-          <div className="h-px bg-neutral-200 dark:bg-neutral-800 mt-2" />
         </div>
       )}
 
+      {/* Loading State */}
       {isLoading && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[1, 2, 3, 4].map((index) => (
-              <div key={index} className="animate-pulse">
-                <div className="aspect-[16/10] bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800" />
-                <div className="pt-5 space-y-3">
-                  <div className="h-3 w-24 bg-neutral-100 dark:bg-neutral-900" />
-                  <div className="h-6 w-2/3 bg-neutral-100 dark:bg-neutral-900" />
-                  <div className="h-4 w-full bg-neutral-100 dark:bg-neutral-900" />
-                </div>
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-8 animate-pulse">
+              <div className="aspect-[16/9] bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800" />
+            </div>
+            <div className="md:col-span-4 animate-pulse">
+              <div className="aspect-[16/9] md:aspect-auto md:h-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800" />
+            </div>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="md:col-span-4 animate-pulse">
+                <div className="aspect-[4/3] bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800" />
               </div>
             ))}
           </div>
         </div>
       )}
 
+      {/* Error State */}
       {error && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24">
           <div className="border border-neutral-200 dark:border-neutral-800 p-12 text-center">
             <p className="text-neutral-500 dark:text-neutral-400 font-mono text-sm">
               Error loading projects. Please try again later.
@@ -148,80 +206,136 @@ export const ProjectsList: React.FC = () => {
         </div>
       )}
 
+      {/* Bento Grid */}
       {!isLoading && !error && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24">
           {filteredProjects.length === 0 ? (
-            <div className="border border-neutral-200 dark:border-neutral-800 p-12 text-center">
+            <div className="border border-neutral-200 dark:border-neutral-800 p-16 text-center">
               <p className="text-neutral-500 dark:text-neutral-400 text-lg">
                 No projects found for this category.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {filteredProjects.map((project, index) => (
-                <article
-                  key={project.id}
-                  ref={(el) => { cardRefs.current[index] = el; }}
-                  className={`group transition-all duration-700 ease-out ${
-                    visibleCards.has(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                  style={{ transitionDelay: `${(index % 2) * 120}ms` }}
+            <div className="space-y-4">
+              {bentoGroups.map((group, groupIndex) => (
+                <div
+                  key={groupIndex}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 bento-row"
+                  style={{ minHeight: group.pattern.some(p => p.size === 'hero' || p.size === 'tall') ? '420px' : 'auto' }}
                 >
-                  <Link to={`/projects/${project.id}`} className="block border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white transition-colors">
-                    <div className="aspect-[16/10] overflow-hidden border-b border-neutral-200 dark:border-neutral-800">
-                      {project.image_url ? (
-                        <img
-                          src={project.image_url}
-                          alt={project.title}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-700"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 text-neutral-400 dark:text-neutral-600 font-mono text-xs uppercase tracking-widest">
-                          No Preview
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-[11px] font-mono uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-600">
-                          {project.category || 'General'}
-                        </span>
-                        <span className="text-[11px] font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
-                          #{String(index + 1).padStart(2, '0')}
-                        </span>
-                      </div>
+                  {group.projects.map((project, itemIndex) => {
+                    const layout = group.pattern[itemIndex];
+                    const cardIndex = globalIndex++;
+                    const num = String(cardIndex + 1).padStart(2, '0');
+                    const isVisible = visibleCards.has(cardIndex);
+                    const isLarge = layout.size === 'hero' || layout.size === 'tall';
 
-                      <h2 className="font-display text-2xl font-medium tracking-tight text-black dark:text-white mb-3 group-hover:translate-x-1 transition-transform duration-300">
-                        {project.title}
-                      </h2>
+                    return (
+                      <article
+                        key={project.id}
+                        ref={(el) => { cardRefs.current[cardIndex] = el; }}
+                        className={`group relative ${layout.col} ${layout.row} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
+                        }`}
+                        style={{ transitionDelay: `${itemIndex * 100 + 50}ms` }}
+                      >
+                        <Link
+                          to={`/projects/${project.id}`}
+                          className="bento-card block relative h-full overflow-hidden border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white transition-all duration-500"
+                        >
+                          {/* Image Layer */}
+                          <div className={`${layout.aspect} overflow-hidden ${isLarge ? 'h-full' : ''}`}>
+                            {project.image_url ? (
+                              <img
+                                src={project.image_url}
+                                alt={project.title}
+                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 text-neutral-400 dark:text-neutral-600 font-mono text-xs uppercase tracking-widest">
+                                No Preview
+                              </div>
+                            )}
+                          </div>
 
-                      {project.description && (
-                        <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed mb-4">
-                          {project.description}
-                        </p>
-                      )}
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                      {project.technologies && project.technologies.length > 0 && (
-                        <div className="flex gap-2 flex-wrap mb-5">
-                          {project.technologies.slice(0, 4).map((technology) => (
-                            <span key={technology} className="text-[10px] font-mono border border-neutral-200 dark:border-neutral-700 px-2 py-1 text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
-                              {technology}
+                          {/* Top-left Index Badge */}
+                          <div className="absolute top-4 left-4 z-10">
+                            <span className="bento-index inline-flex items-center justify-center w-8 h-8 border border-white/20 text-white/60 text-[10px] font-mono tracking-widest backdrop-blur-sm bg-black/20 group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-400">
+                              {num}
                             </span>
-                          ))}
-                        </div>
-                      )}
+                          </div>
 
-                      <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-black dark:text-white">
-                        View Project
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1">
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                          <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                      </div>
-                    </div>
-                  </Link>
-                </article>
+                          {/* Top-right Category */}
+                          <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-400 delay-75">
+                            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-white/70 backdrop-blur-sm bg-black/20 px-2 py-1">
+                              {project.category || 'General'}
+                            </span>
+                          </div>
+
+                          {/* Bottom Content (appears on hover) */}
+                          <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6 z-10 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out">
+                            <h2 className={`font-display font-semibold tracking-tight text-white mb-2 leading-tight ${
+                              isLarge ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
+                            }`}>
+                              {project.title}
+                            </h2>
+
+                            {project.description && isLarge && (
+                              <p className="text-white/60 text-sm leading-relaxed mb-3 line-clamp-2">
+                                {project.description}
+                              </p>
+                            )}
+
+                            {project.technologies && project.technologies.length > 0 && (
+                              <div className="flex gap-1.5 flex-wrap mb-3">
+                                {project.technologies.slice(0, isLarge ? 5 : 3).map((tech) => (
+                                  <span
+                                    key={tech}
+                                    className="text-[9px] font-mono uppercase tracking-widest text-white/50 border border-white/15 px-1.5 py-0.5"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-white/80 group-hover:text-white transition-colors">
+                              View Project
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1">
+                                <line x1="7" y1="17" x2="17" y2="7" />
+                                <polyline points="7 7 17 7 17 17" />
+                              </svg>
+                            </div>
+                          </div>
+
+                          {/* Static bottom bar (visible when not hovering) */}
+                          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 bg-white/95 dark:bg-geo-dark-bg/95 backdrop-blur-sm border-t border-neutral-200 dark:border-neutral-800 group-hover:opacity-0 group-hover:translate-y-2 transition-all duration-400 z-10">
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="min-w-0">
+                                <h2 className={`font-display font-semibold tracking-tight text-black dark:text-white truncate ${
+                                  isLarge ? 'text-lg md:text-xl' : 'text-base'
+                                }`}>
+                                  {project.title}
+                                </h2>
+                                <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-600">
+                                  {project.category || 'General'}
+                                </span>
+                              </div>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-300 dark:text-neutral-700 flex-shrink-0 group-hover:text-black dark:group-hover:text-white transition-colors">
+                                <line x1="7" y1="17" x2="17" y2="7" />
+                                <polyline points="7 7 17 7 17 17" />
+                              </svg>
+                            </div>
+                          </div>
+                        </Link>
+                      </article>
+                    );
+                  })}
+                </div>
               ))}
             </div>
           )}

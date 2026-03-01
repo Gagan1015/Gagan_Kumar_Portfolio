@@ -102,7 +102,7 @@ export const BlogList: React.FC = () => {
       {/* Category Filter Tabs */}
       {categories && categories.length > 0 && (
         <div className="max-w-7xl mx-auto px-6 md:px-12 pb-12">
-          <div className="flex items-center gap-1 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex items-center gap-1 flex-wrap">
             <button
               onClick={() => setSelectedCategory(undefined)}
               className={`blog-filter-tab ${!selectedCategory ? 'active' : ''}`}

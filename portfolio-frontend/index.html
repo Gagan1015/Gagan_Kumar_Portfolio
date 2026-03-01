@@ -1163,6 +1163,9 @@
       line-height: 1.8;
       font-size: 1.05rem;
       transition: color 0.3s ease;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
     }
 
     .dark .blog-prose {
@@ -1260,7 +1263,7 @@
       padding-left: 0.5rem;
     }
 
-    .blog-prose-ul > .blog-prose-li::before {
+    .blog-prose-ul>.blog-prose-li::before {
       content: '';
       position: absolute;
       left: -1rem;
@@ -1271,7 +1274,7 @@
       transition: background-color 0.3s ease;
     }
 
-    .dark .blog-prose-ul > .blog-prose-li::before {
+    .dark .blog-prose-ul>.blog-prose-li::before {
       background: #555;
     }
 
@@ -1323,6 +1326,7 @@
       font-size: 0.875rem;
       line-height: 1.7;
       border: 1px solid #333;
+      max-width: 100%;
     }
 
     .dark .blog-prose-pre {
@@ -1405,20 +1409,62 @@
     }
 
     /* Code Syntax Highlighting Overrides */
-    .blog-prose-pre .hljs-keyword { color: #c792ea; }
-    .blog-prose-pre .hljs-string { color: #c3e88d; }
-    .blog-prose-pre .hljs-number { color: #f78c6c; }
-    .blog-prose-pre .hljs-function { color: #82aaff; }
-    .blog-prose-pre .hljs-comment { color: #676e95; font-style: italic; }
-    .blog-prose-pre .hljs-built_in { color: #ffcb6b; }
-    .blog-prose-pre .hljs-attr { color: #f07178; }
-    .blog-prose-pre .hljs-tag { color: #f07178; }
-    .blog-prose-pre .hljs-name { color: #f07178; }
-    .blog-prose-pre .hljs-title { color: #82aaff; }
-    .blog-prose-pre .hljs-params { color: #e0e0e0; }
-    .blog-prose-pre .hljs-type { color: #ffcb6b; }
-    .blog-prose-pre .hljs-meta { color: #89ddff; }
-    .blog-prose-pre .hljs-literal { color: #ff5370; }
+    .blog-prose-pre .hljs-keyword {
+      color: #c792ea;
+    }
+
+    .blog-prose-pre .hljs-string {
+      color: #c3e88d;
+    }
+
+    .blog-prose-pre .hljs-number {
+      color: #f78c6c;
+    }
+
+    .blog-prose-pre .hljs-function {
+      color: #82aaff;
+    }
+
+    .blog-prose-pre .hljs-comment {
+      color: #676e95;
+      font-style: italic;
+    }
+
+    .blog-prose-pre .hljs-built_in {
+      color: #ffcb6b;
+    }
+
+    .blog-prose-pre .hljs-attr {
+      color: #f07178;
+    }
+
+    .blog-prose-pre .hljs-tag {
+      color: #f07178;
+    }
+
+    .blog-prose-pre .hljs-name {
+      color: #f07178;
+    }
+
+    .blog-prose-pre .hljs-title {
+      color: #82aaff;
+    }
+
+    .blog-prose-pre .hljs-params {
+      color: #e0e0e0;
+    }
+
+    .blog-prose-pre .hljs-type {
+      color: #ffcb6b;
+    }
+
+    .blog-prose-pre .hljs-meta {
+      color: #89ddff;
+    }
+
+    .blog-prose-pre .hljs-literal {
+      color: #ff5370;
+    }
 
     /* Blog Responsive */
     @media (max-width: 768px) {
@@ -1446,6 +1492,11 @@
         padding: 1rem;
         font-size: 0.8rem;
       }
+
+      .blog-prose-blockquote {
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+      }
     }
 
     /* Scrollbar hide utility */
@@ -1456,6 +1507,63 @@
 
     .scrollbar-hide::-webkit-scrollbar {
       display: none;
+    }
+
+    /* ============================================
+       BENTO GRID — Projects Page
+       ============================================ */
+
+    .bento-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bento-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid transparent;
+      transition: border-color 0.4s ease;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .bento-card:hover::after {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Line clamp utility */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Bento row min height for pattern consistency */
+    .bento-row {
+      transition: all 0.5s ease;
+    }
+
+    @media (max-width: 768px) {
+      .bento-row {
+        min-height: auto !important;
+      }
+    }
+
+    /* Bento index badge pulse on card hover */
+    .bento-index {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reduced motion for bento grid */
+    @media (prefers-reduced-motion: reduce) {
+
+      .bento-card,
+      .bento-card img,
+      .bento-index {
+        transition-duration: 0.01s !important;
+      }
     }
   </style>
   <script type="importmap">

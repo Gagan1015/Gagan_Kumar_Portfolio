@@ -257,9 +257,9 @@ export const BlogPostPage: React.FC = () => {
 
       {/* Content + ToC Layout */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative">
-        <div className="flex gap-12">
+        <div className="flex gap-12 overflow-hidden">
           {/* Main Content */}
-          <div className="flex-1 max-w-4xl mx-auto">
+          <div className="flex-1 min-w-0 max-w-4xl mx-auto">
             <div className="blog-prose">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
