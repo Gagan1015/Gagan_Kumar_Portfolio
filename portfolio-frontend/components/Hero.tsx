@@ -1,9 +1,141 @@
-import React, { useState, useEffect } from 'react';
-import { SectionId } from '../types';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { SectionId, Profile } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
 import { resumeService } from '../services/portfolioService';
 
 const ROTATING_WORDS = ['Developer', 'Engineer'];
+
+// Segment: a piece of text with a CSS class
+type Segment = { text: string; cls: string };
+// A code line: line number + array of styled segments
+type CodeLine = { num: string; segments: Segment[] };
+
+const CodeTypewriter: React.FC<{ profile: Profile | undefined; techStack: string[] }> = ({ profile, techStack }) => {
+  const [charCount, setCharCount] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startedRef = useRef(false);
+
+  // Build lines from profile data — memoized to avoid recalc
+  const lines: CodeLine[] = useMemo(() => {
+    const propCls = 'text-neutral-600 dark:text-neutral-400';
+    const strCls = 'text-green-600 dark:text-green-400';
+    const kwCls = 'text-purple-500 dark:text-purple-400';
+    const numCls = 'text-amber-500 dark:text-amber-400';
+    const defCls = 'text-neutral-400 dark:text-neutral-600';
+    const nameCls = 'text-black dark:text-white font-semibold';
+
+    const result: CodeLine[] = [
+      { num: '01', segments: [
+        { text: 'const', cls: kwCls }, { text: ' ', cls: defCls }, { text: 'developer', cls: nameCls }, { text: ' = {', cls: defCls }
+      ]},
+      { num: '02', segments: [
+        { text: '  ', cls: defCls }, { text: 'name', cls: propCls }, { text: ': ', cls: defCls }, { text: `"${profile?.full_name || '...'}"`, cls: strCls }, { text: ',', cls: defCls }
+      ]},
+      { num: '03', segments: [
+        { text: '  ', cls: defCls }, { text: 'role', cls: propCls }, { text: ': ', cls: defCls }, { text: `"${profile?.title || '...'}"`, cls: strCls }, { text: ',', cls: defCls }
+      ]},
+      { num: '04', segments: [
+        { text: '  ', cls: defCls }, { text: 'location', cls: propCls }, { text: ': ', cls: defCls }, { text: `"${profile?.location || '...'}"`, cls: strCls }, { text: ',', cls: defCls }
+      ]},
+      { num: '05', segments: [
+        { text: '  ', cls: defCls }, { text: 'experience', cls: propCls }, { text: ': ', cls: defCls }, { text: `${profile?.years_of_experience || '0'}+`, cls: numCls }, { text: ' years,', cls: defCls }
+      ]},
+      { num: '06', segments: [
+        { text: '  ', cls: defCls }, { text: 'stack', cls: propCls }, { text: ': [', cls: defCls }
+      ]},
+    ];
+
+    techStack.forEach((tech, i) => {
+      result.push({
+        num: String(7 + i).padStart(2, '0'),
+        segments: [
+          { text: '    ', cls: defCls }, { text: `"${tech}"`, cls: strCls }, { text: i < techStack.length - 1 ? ',' : '', cls: defCls }
+        ]
+      });
+    });
+
+    result.push({ num: String(7 + techStack.length).padStart(2, '0'), segments: [{ text: '  }],', cls: defCls }] });
+    result.push({ num: String(8 + techStack.length).padStart(2, '0'), segments: [
+      { text: '  ', cls: defCls }, { text: 'available', cls: propCls }, { text: ': ', cls: defCls }, { text: 'true', cls: kwCls }, { text: ',', cls: defCls }
+    ]});
+    result.push({ num: String(9 + techStack.length).padStart(2, '0'), segments: [{ text: '};', cls: defCls }] });
+
+    return result;
+  }, [profile, techStack]);
+
+  // Total characters across all lines
+  const totalChars = useMemo(() => {
+    return lines.reduce((sum, line) => sum + line.segments.reduce((s, seg) => s + seg.text.length, 0), 0);
+  }, [lines]);
+
+  // Start typing after a delay
+  useEffect(() => {
+    if (startedRef.current) return;
+    const delay = setTimeout(() => {
+      startedRef.current = true;
+      timerRef.current = setInterval(() => {
+        setCharCount(prev => {
+          if (prev >= totalChars) {
+            if (timerRef.current) clearInterval(timerRef.current);
+            return totalChars;
+          }
+          return prev + 1;
+        });
+      }, 30);
+    }, 1000);
+    return () => {
+      clearTimeout(delay);
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [totalChars]);
+
+  // Render lines with partial text reveal
+  let charsRemaining = charCount;
+
+  return (
+    <>
+      {lines.map((line, lineIdx) => {
+        const lineCharCount = line.segments.reduce((s, seg) => s + seg.text.length, 0);
+        // If we haven't reached this line yet, skip it
+        if (charsRemaining <= 0 && charCount > 0) return null;
+        // If charCount is 0 (not started), show nothing
+        if (charCount === 0) return null;
+
+        const lineCharsToShow = Math.min(charsRemaining, lineCharCount);
+        charsRemaining -= lineCharCount;
+        const isCurrentLine = lineCharsToShow > 0 && lineCharsToShow < lineCharCount;
+        const isLastTypedLine = charsRemaining <= 0 && lineCharsToShow > 0;
+
+        let segCharsLeft = lineCharsToShow;
+        return (
+          <div key={lineIdx} className="text-neutral-400 dark:text-neutral-600" style={{ minHeight: '1.5rem' }}>
+            <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4 inline-block w-5 text-right">{line.num}</span>
+            {line.segments.map((seg, segIdx) => {
+              if (segCharsLeft <= 0) return null;
+              const visibleText = seg.text.slice(0, segCharsLeft);
+              segCharsLeft -= seg.text.length;
+              return <span key={segIdx} className={seg.cls}>{visibleText}</span>;
+            })}
+            {/* Blinking cursor */}
+            {(isCurrentLine || (isLastTypedLine && charCount >= totalChars)) && (
+              <span className="code-cursor">|</span>
+            )}
+          </div>
+        );
+      })}
+      {/* Show empty lines for lines not yet reached — keeps consistent height */}
+      {charCount > 0 && charCount < totalChars && (
+        Array.from({ length: lines.length - lines.filter((_, i) => {
+          let c = 0;
+          for (let j = 0; j <= i; j++) c += lines[j].segments.reduce((s, seg) => s + seg.text.length, 0);
+          return charCount >= c - lines[i].segments.reduce((s, seg) => s + seg.text.length, 0) + 1;
+        }).length }).map((_, i) => (
+          <div key={`empty-${i}`} style={{ minHeight: '1.5rem' }} />
+        ))
+      )}
+    </>
+  );
+};
 
 export const Hero: React.FC = () => {
   const { data: profile, isLoading } = useProfile();
@@ -322,58 +454,19 @@ export const Hero: React.FC = () => {
               <div className="absolute -left-8 top-0 bottom-0 w-px bg-neutral-200 dark:bg-neutral-800" />
 
               {/* Terminal-style code block */}
-              <div className="border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-                {/* Terminal header */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-200 dark:border-neutral-800">
-                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                  <span className="ml-3 text-[10px] font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600">about.tsx</span>
+              <div className="border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 overflow-hidden">
+                {/* Terminal header — macOS style */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-800/30">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-[#FF5F57] hover:brightness-110 transition-all cursor-default shadow-[0_0_4px_rgba(255,95,87,0.3)]" />
+                    <div className="w-3 h-3 rounded-full bg-[#FFBD2E] hover:brightness-110 transition-all cursor-default shadow-[0_0_4px_rgba(255,189,46,0.3)]" />
+                    <div className="w-3 h-3 rounded-full bg-[#27C93F] hover:brightness-110 transition-all cursor-default shadow-[0_0_4px_rgba(39,201,63,0.3)]" />
+                  </div>
+                  <span className="ml-3 text-[10px] font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-500">about.tsx</span>
                 </div>
-                {/* Code content */}
+                {/* Code content with character-by-character typewriter */}
                 <div className="p-5 font-mono text-xs leading-6">
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">01</span>
-                    <span className="text-blue-500">const</span> <span className="text-black dark:text-white">developer</span> <span className="text-neutral-400">=</span> {'{'}
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">02</span>
-                    {'  '}<span className="text-neutral-600 dark:text-neutral-400">name</span>: <span className="text-green-600 dark:text-green-400">"{profile?.full_name || '...'}"</span>,
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">03</span>
-                    {'  '}<span className="text-neutral-600 dark:text-neutral-400">role</span>: <span className="text-green-600 dark:text-green-400">"{profile?.title || '...'}"</span>,
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">04</span>
-                    {'  '}<span className="text-neutral-600 dark:text-neutral-400">location</span>: <span className="text-green-600 dark:text-green-400">"{profile?.location || '...'}"</span>,
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">05</span>
-                    {'  '}<span className="text-neutral-600 dark:text-neutral-400">experience</span>: <span className="text-amber-600 dark:text-amber-400">{profile?.years_of_experience || '0'}+</span> <span className="text-neutral-400 dark:text-neutral-600">years</span>,
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">06</span>
-                    {'  '}<span className="text-neutral-600 dark:text-neutral-400">stack</span>: [
-                  </div>
-                  {techStack.map((tech, i) => (
-                    <div key={tech} className="text-neutral-400 dark:text-neutral-600">
-                      <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">{String(7 + i).padStart(2, '0')}</span>
-                      {'    '}<span className="text-green-600 dark:text-green-400">"{tech}"</span>{i < techStack.length - 1 ? ',' : ''}
-                    </div>
-                  ))}
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">{String(7 + techStack.length).padStart(2, '0')}</span>
-                    {'  }],'}
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">{String(8 + techStack.length).padStart(2, '0')}</span>
-                    {'  '}<span className="text-neutral-600 dark:text-neutral-400">available</span>: <span className="text-blue-500">true</span>,
-                  </div>
-                  <div className="text-neutral-400 dark:text-neutral-600">
-                    <span className="text-neutral-300 dark:text-neutral-700 select-none mr-4">{String(9 + techStack.length).padStart(2, '0')}</span>
-                    {'};'}
-                  </div>
+                  <CodeTypewriter profile={profile} techStack={techStack} />
                 </div>
               </div>
 

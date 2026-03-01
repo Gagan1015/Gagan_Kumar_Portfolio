@@ -2,6 +2,17 @@ import React, { useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useProject, useProjects } from '../hooks/usePortfolio';
 
+// SEO meta tag helpers
+const updateMetaTag = (attr: string, key: string, value: string) => {
+  let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('content', value);
+};
+
 const formatDateRange = (startDate: string | null, endDate: string | null): string | null => {
   if (!startDate && !endDate) return null;
 
@@ -31,11 +42,52 @@ export const ProjectDetailPage: React.FC = () => {
     [project?.start_date, project?.end_date]
   );
 
+  // SEO: Dynamic meta tags for project detail pages
   useEffect(() => {
     if (!project) return;
-    document.title = `${project.title} | Projects | Gagan Kumar`;
+
+    const pageTitle = `${project.title} | Projects | Gagan Kumar`;
+    const pageDesc = project.description || `${project.title} — a ${project.category || 'project'} by Gagan Kumar built with ${project.technologies?.join(', ') || 'modern technologies'}.`;
+    const pageUrl = `https://gagankumar.me/projects/${project.id}`;
+    const pageImage = project.image_url || 'https://gagankumar.me/og-image.png';
+
+    document.title = pageTitle;
+    updateMetaTag('name', 'description', pageDesc);
+    updateMetaTag('property', 'og:title', pageTitle);
+    updateMetaTag('property', 'og:description', pageDesc);
+    updateMetaTag('property', 'og:url', pageUrl);
+    updateMetaTag('property', 'og:image', pageImage);
+    updateMetaTag('property', 'og:type', 'article');
+    updateMetaTag('property', 'twitter:title', pageTitle);
+    updateMetaTag('property', 'twitter:description', pageDesc);
+    updateMetaTag('property', 'twitter:image', pageImage);
+
+    // JSON-LD structured data for project
+    const existing = document.querySelector('script[data-project-jsonld]');
+    if (existing) existing.remove();
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-project-jsonld', 'true');
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: project.title,
+      description: project.description,
+      image: project.image_url,
+      url: project.website_url || pageUrl,
+      author: { '@type': 'Person', name: 'Gagan Kumar' },
+      keywords: project.technologies?.join(', '),
+    });
+    document.head.appendChild(script);
+
+    // Update canonical
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (canonical) canonical.setAttribute('href', pageUrl);
+
     return () => {
-      document.title = 'Gagan Kumar | Portfolio';
+      document.title = 'Gagan Kumar — Full-Stack Developer Portfolio';
+      const jsonLd = document.querySelector('script[data-project-jsonld]');
+      if (jsonLd) jsonLd.remove();
     };
   }, [project]);
 

@@ -4,8 +4,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>Gagan Kumar — Full-Stack Developer Portfolio</title>
+  <meta name="title" content="Gagan Kumar — Full-Stack Developer Portfolio" />
+  <meta name="description"
+    content="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog." />
+  <meta name="keywords"
+    content="Gagan Kumar, Full-Stack Developer, Software Engineer, React Developer, TypeScript, Laravel, Portfolio, Web Developer, Frontend Engineer, Backend Developer" />
+  <meta name="author" content="Gagan Kumar" />
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="English" />
+  <meta name="revisit-after" content="7 days" />
+  <meta name="theme-color" content="#121212" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://gagankumar.me/" />
+
+  <!-- Favicons -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <title>Gagan Kumar | Portfolio</title>
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://gagankumar.me/" />
+  <meta property="og:title" content="Gagan Kumar — Full-Stack Developer Portfolio" />
+  <meta property="og:description"
+    content="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog." />
+  <meta property="og:image" content="https://gagankumar.me/og-image.png" />
+  <meta property="og:image:alt" content="Gagan Kumar — Full-Stack Developer Portfolio" />
+  <meta property="og:site_name" content="Gagan Kumar Portfolio" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://gagankumar.me/" />
+  <meta property="twitter:title" content="Gagan Kumar — Full-Stack Developer Portfolio" />
+  <meta property="twitter:description"
+    content="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog." />
+  <meta property="twitter:image" content="https://gagankumar.me/og-image.png" />
+
   <script src="/env-config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,6 +193,25 @@
 
       100% {
         transform: translate(25px, 15px) scale(1.08);
+      }
+    }
+
+    /* Code editor typewriter cursor */
+    .code-cursor {
+      color: #a855f7;
+      font-weight: 300;
+      animation: cursorBlink 1s step-end infinite;
+    }
+
+    @keyframes cursorBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
       }
     }
 
@@ -952,6 +1010,7 @@
       margin-top: 0.5rem;
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       transition: color 0.3s ease;
@@ -1536,6 +1595,7 @@
     .line-clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -1580,6 +1640,58 @@
 </head>
 
 <body>
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Gagan Kumar",
+    "url": "https://gagankumar.me",
+    "image": "https://gagankumar.me/og-image.png",
+    "jobTitle": "Full-Stack Developer",
+    "description": "Full-Stack Developer and Software Engineer specializing in React, TypeScript, Laravel, and modern web technologies.",
+    "sameAs": [
+      "https://linkedin.com/in/gagankumar",
+      "https://github.com/Gagan1015",
+      "https://x.com/gagankumar"
+    ],
+    "knowsAbout": ["React", "TypeScript", "Laravel", "PHP", "JavaScript", "Node.js", "Full-Stack Development", "Web Development", "Software Engineering"]
+  }
+  </script>
+  <!-- WebSite Schema for Search Box -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Gagan Kumar Portfolio",
+    "url": "https://gagankumar.me",
+    "description": "Portfolio website of Gagan Kumar — Full-Stack Developer and Software Engineer"
+  }
+  </script>
+  <noscript>
+    <div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:sans-serif">
+      <h1>Gagan Kumar — Full-Stack Developer & Software Engineer</h1>
+      <p>Welcome to the portfolio of Gagan Kumar, a Full-Stack Developer specializing in React, TypeScript, Laravel,
+        PHP, JavaScript, Node.js, and modern web technologies.</p>
+      <h2>About</h2>
+      <p>Experienced software engineer with expertise in building high-performance web applications, REST APIs, and
+        scalable systems.</p>
+      <h2>Skills</h2>
+      <p>React, TypeScript, JavaScript, Laravel, PHP, Node.js, Python, WordPress, HTML, CSS, Tailwind CSS, PostgreSQL,
+        MySQL, Docker, AWS, Git, REST APIs, GraphQL</p>
+      <h2>Contact</h2>
+      <p>Visit <a href="https://gagankumar.me">gagankumar.me</a> to explore projects, blog posts, and get in touch.</p>
+      <nav>
+        <a href="/projects">Projects</a> | <a href="/blog">Blog</a>
+      </nav>
+      <h2>Connect</h2>
+      <ul>
+        <li><a href="https://linkedin.com/in/gagankumar" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="https://github.com/Gagan1015" rel="noopener noreferrer">GitHub</a></li>
+        <li><a href="https://x.com/gagankumar" rel="noopener noreferrer">X (Twitter)</a></li>
+      </ul>
+    </div>
+  </noscript>
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

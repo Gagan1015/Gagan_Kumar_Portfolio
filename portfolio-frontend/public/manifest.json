@@ -1,0 +1,16 @@
+{
+  "name": "Gagan Kumar Portfolio",
+  "short_name": "GK Portfolio",
+  "description": "Portfolio of Gagan Kumar — Full-Stack Developer & Software Engineer specializing in React, TypeScript, Laravel, and modern web technologies.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -74,7 +74,7 @@ export const ProjectsList: React.FC = () => {
   useEffect(() => {
     document.title = 'Projects | Gagan Kumar';
     return () => {
-      document.title = 'Gagan Kumar | Portfolio';
+      document.title = 'Gagan Kumar — Full-Stack Developer Portfolio';
     };
   }, []);
 

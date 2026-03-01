@@ -15,6 +15,7 @@ import { BlogList } from './components/BlogList';
 import { BlogPostPage } from './components/BlogPost';
 import { ProjectsList } from './components/ProjectsList';
 import { ProjectDetailPage } from './components/ProjectDetail';
+import { SEOHead } from './components/SEOHead';
 import { SectionId, Theme } from './types';
 import { useProfile } from './hooks/usePortfolio';
 
@@ -86,12 +87,6 @@ const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: str
   const { data: profile } = useProfile();
 
   useEffect(() => {
-    if (profile?.full_name) {
-      document.title = `${profile.full_name} | Portfolio`;
-    }
-  }, [profile]);
-
-  useEffect(() => {
     const handleScroll = () => {
       const sections = Object.values(SectionId);
       const scrollPosition = window.scrollY + window.innerHeight / 3;
@@ -114,6 +109,11 @@ const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: str
 
   return (
     <div className="bg-white dark:bg-geo-dark-bg min-h-screen selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
+      <SEOHead 
+        title={`${profile?.full_name || 'Gagan Kumar'} — Full-Stack Developer Portfolio`}
+        description="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog."
+        url="https://gagankumar.me/"
+      />
       <Header activeSection={activeSection} theme={theme} onToggleTheme={onToggleTheme} />
       <main>
         <Hero />
@@ -163,6 +163,11 @@ const AppContent: React.FC = () => {
         path="/blog" 
         element={
           <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
+            <SEOHead 
+              title="Blog — Gagan Kumar | Full-Stack Developer"
+              description="Read blog posts by Gagan Kumar on web development, React, TypeScript, Laravel, PHP, and modern software engineering topics."
+              url="https://gagankumar.me/blog"
+            />
             <BlogList />
           </ContentLayout>
         } 
@@ -179,6 +184,11 @@ const AppContent: React.FC = () => {
         path="/projects"
         element={
           <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
+            <SEOHead 
+              title="Projects — Gagan Kumar | Full-Stack Developer"
+              description="Explore projects by Gagan Kumar — web applications, APIs, design systems, and experiments built with React, TypeScript, Laravel, and more."
+              url="https://gagankumar.me/projects"
+            />
             <ProjectsList />
           </ContentLayout>
         }

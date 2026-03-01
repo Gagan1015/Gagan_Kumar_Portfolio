@@ -103,7 +103,7 @@ export const BlogPostPage: React.FC = () => {
     });
 
     return () => {
-      document.title = 'Gagan Kumar | Portfolio';
+      document.title = 'Gagan Kumar — Full-Stack Developer Portfolio';
       const jsonLd = document.querySelector('script[data-blog-jsonld]');
       if (jsonLd) jsonLd.remove();
     };

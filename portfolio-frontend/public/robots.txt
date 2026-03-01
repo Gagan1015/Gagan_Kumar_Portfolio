@@ -1,0 +1,7 @@
+# robots.txt for gagankumar.me
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://gagankumar.me/sitemap.xml

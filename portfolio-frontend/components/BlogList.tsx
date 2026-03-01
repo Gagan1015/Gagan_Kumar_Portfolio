@@ -18,7 +18,7 @@ export const BlogList: React.FC = () => {
   useEffect(() => {
     document.title = 'Blog | Gagan Kumar';
     return () => {
-      document.title = 'Gagan Kumar | Portfolio';
+      document.title = 'Gagan Kumar — Full-Stack Developer Portfolio';
     };
   }, []);
 

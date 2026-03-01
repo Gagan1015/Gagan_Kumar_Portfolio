@@ -265,7 +265,7 @@ export const Projects: React.FC = () => {
           <div className="w-full h-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black overflow-hidden shadow-2xl dark:shadow-none">
             <img
               src={projects.find(p => p.id === hoveredId)?.image_url || 'https://picsum.photos/640/400'}
-              alt=""
+              alt={`Preview of ${projects.find(p => p.id === hoveredId)?.title || 'project'}`}
               className="w-full h-full object-cover"
             />
           </div>

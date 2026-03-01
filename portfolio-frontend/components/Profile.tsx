@@ -1,45 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionId } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
 import { useSkillsGrouped } from '../hooks/usePortfolio';
 
-// Animated counter hook
+// Animated counter hook — uses callback ref to handle late-mounting elements
 function useCountUp(target: number, duration: number = 2000) {
   const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    if (target <= 0 || hasAnimated.current) return;
+  // Callback ref: fires when the DOM element is attached/detached
+  const ref = useCallback(
+    (node: HTMLDivElement | null) => {
+      // Cleanup previous observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
 
-    const el = ref.current;
-    if (!el) return;
+      if (!node || target <= 0 || hasAnimated.current) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          observer.disconnect();
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && !hasAnimated.current) {
+            hasAnimated.current = true;
+            observer.disconnect();
 
-          let start = 0;
-          const step = target / (duration / 16);
-          const timer = setInterval(() => {
-            start += step;
-            if (start >= target) {
-              setCount(target);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(start));
-            }
-          }, 16);
-        }
-      },
-      { threshold: 0.3 }
-    );
+            let start = 0;
+            const step = target / (duration / 16);
+            const timer = setInterval(() => {
+              start += step;
+              if (start >= target) {
+                setCount(target);
+                clearInterval(timer);
+              } else {
+                setCount(Math.floor(start));
+              }
+            }, 16);
+          }
+        },
+        { threshold: 0.3 }
+      );
 
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [target, duration]);
+      observer.observe(node);
+      observerRef.current = observer;
+    },
+    [target, duration]
+  );
 
   return { count, ref };
 }
@@ -83,22 +90,10 @@ export const Profile: React.FC = () => {
   const { data: skillsGrouped } = useSkillsGrouped();
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
 
-  // Calculate total skills
-  const totalSkills = skillsGrouped
-    ? Object.values(skillsGrouped).flat().length
-    : 0;
-
-  // Calculate skill categories
-  const totalCategories = skillsGrouped
-    ? Object.keys(skillsGrouped).length
-    : 0;
-
-  const { count: yearsCount, ref: yearsRef } = useCountUp(
-    profile?.years_of_experience ?? 0,
-    1500
-  );
-  const { count: skillsCount, ref: skillsRef } = useCountUp(totalSkills, 1800);
-  const { count: categoriesCount, ref: categoriesRef } = useCountUp(totalCategories, 1200);
+  // Hardcoded stats with count-up animation
+  const { count: yearsCount, ref: yearsRef } = useCountUp(1, 1500);
+  const { count: skillsCount, ref: skillsRef } = useCountUp(10, 1800);
+  const { count: categoriesCount, ref: categoriesRef } = useCountUp(3, 1200);
 
   if (isLoading) {
     return (
