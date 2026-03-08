@@ -1,23 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { Profile } from './components/Profile';
-
-import { Experience } from './components/Experience';
-import { Projects } from './components/Projects';
-import { Skills } from './components/Skills';
-import { Education } from './components/Education';
-import { Footer } from './components/Footer';
-import { AIChat } from './components/AIChat';
-import { BlogList } from './components/BlogList';
-import { BlogPostPage } from './components/BlogPost';
-import { ProjectsList } from './components/ProjectsList';
-import { ProjectDetailPage } from './components/ProjectDetail';
 import { SEOHead } from './components/SEOHead';
 import { SectionId, Theme } from './types';
 import { useProfile } from './hooks/usePortfolio';
+
+// Lazy-load below-the-fold home sections to reduce initial JS payload
+const Profile = lazy(() => import('./components/Profile').then(m => ({ default: m.Profile })));
+const Experience = lazy(() => import('./components/Experience').then(m => ({ default: m.Experience })));
+const Projects = lazy(() => import('./components/Projects').then(m => ({ default: m.Projects })));
+const Skills = lazy(() => import('./components/Skills').then(m => ({ default: m.Skills })));
+const Education = lazy(() => import('./components/Education').then(m => ({ default: m.Education })));
+const Footer = lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
+const AIChat = lazy(() => import('./components/AIChat').then(m => ({ default: m.AIChat })));
+
+// Lightweight chat launcher — only loads the 221KB AIChat chunk when user clicks
+const AIChatLauncher: React.FC = () => {
+  const [showChat, setShowChat] = useState(false);
+  return (
+    <>
+      {showChat ? (
+        <Suspense fallback={null}>
+          <AIChat />
+        </Suspense>
+      ) : (
+        <button
+          onClick={() => setShowChat(true)}
+          className="fixed bottom-8 right-8 z-50 flex items-center justify-center w-14 h-14 bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white transition-transform duration-300 hover:scale-105"
+          aria-label="Toggle AI Chat"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" strokeLinejoin="miter">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
+        </button>
+      )}
+    </>
+  );
+};
+
+// Lazy-load page components for code splitting
+const BlogList = lazy(() => import('./components/BlogList').then(m => ({ default: m.BlogList })));
+const BlogPostPage = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPostPage })));
+const ProjectsList = lazy(() => import('./components/ProjectsList').then(m => ({ default: m.ProjectsList })));
+const ProjectDetailPage = lazy(() => import('./components/ProjectDetail').then(m => ({ default: m.ProjectDetailPage })));
 
 // Create QueryClient instance
 const queryClient = new QueryClient({
@@ -117,14 +144,18 @@ const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: str
       <Header activeSection={activeSection} theme={theme} onToggleTheme={onToggleTheme} />
       <main>
         <Hero />
-        <Profile />
-        <Experience />
-        <Skills />
-        <Projects />
-        <Education />
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Profile />
+          <Experience />
+          <Skills />
+          <Projects />
+          <Education />
+        </Suspense>
       </main>
-      <Footer />
-      <AIChat />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
+      <AIChatLauncher />
     </div>
   );
 };
@@ -137,7 +168,9 @@ const ContentLayout: React.FC<{ children: React.ReactNode; theme: Theme; onToggl
     <div className="bg-white dark:bg-geo-dark-bg min-h-screen selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
       <Header activeSection={activeNav} theme={theme} onToggleTheme={onToggleTheme} />
       {children}
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };
@@ -147,61 +180,63 @@ const AppContent: React.FC = () => {
   const { theme, cycleTheme } = useTheme();
 
   return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          <PortfolioHome 
-            activeSection={activeSection} 
-            setActiveSection={setActiveSection} 
-            theme={theme} 
-            onToggleTheme={cycleTheme} 
-          />
-        } 
-      />
-      <Route 
-        path="/blog" 
-        element={
-          <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
-            <SEOHead 
-              title="Blog — Gagan Kumar | Full-Stack Developer"
-              description="Read blog posts by Gagan Kumar on web development, React, TypeScript, Laravel, PHP, and modern software engineering topics."
-              url="https://gagankumar.me/blog"
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <PortfolioHome 
+              activeSection={activeSection} 
+              setActiveSection={setActiveSection} 
+              theme={theme} 
+              onToggleTheme={cycleTheme} 
             />
-            <BlogList />
-          </ContentLayout>
-        } 
-      />
-      <Route 
-        path="/blog/:slug" 
-        element={
-          <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
-            <BlogPostPage />
-          </ContentLayout>
-        } 
-      />
-      <Route
-        path="/projects"
-        element={
-          <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
-            <SEOHead 
-              title="Projects — Gagan Kumar | Full-Stack Developer"
-              description="Explore projects by Gagan Kumar — web applications, APIs, design systems, and experiments built with React, TypeScript, Laravel, and more."
-              url="https://gagankumar.me/projects"
-            />
-            <ProjectsList />
-          </ContentLayout>
-        }
-      />
-      <Route
-        path="/projects/:id"
-        element={
-          <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
-            <ProjectDetailPage />
-          </ContentLayout>
-        } 
-      />
-    </Routes>
+          } 
+        />
+        <Route 
+          path="/blog" 
+          element={
+            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
+              <SEOHead 
+                title="Blog — Gagan Kumar | Full-Stack Developer"
+                description="Read blog posts by Gagan Kumar on web development, React, TypeScript, Laravel, PHP, and modern software engineering topics."
+                url="https://gagankumar.me/blog"
+              />
+              <BlogList />
+            </ContentLayout>
+          } 
+        />
+        <Route 
+          path="/blog/:slug" 
+          element={
+            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
+              <BlogPostPage />
+            </ContentLayout>
+          } 
+        />
+        <Route
+          path="/projects"
+          element={
+            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
+              <SEOHead 
+                title="Projects — Gagan Kumar | Full-Stack Developer"
+                description="Explore projects by Gagan Kumar — web applications, APIs, design systems, and experiments built with React, TypeScript, Laravel, and more."
+                url="https://gagankumar.me/projects"
+              />
+              <ProjectsList />
+            </ContentLayout>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
+              <ProjectDetailPage />
+            </ContentLayout>
+          } 
+        />
+      </Routes>
+    </Suspense>
   );
 };
 

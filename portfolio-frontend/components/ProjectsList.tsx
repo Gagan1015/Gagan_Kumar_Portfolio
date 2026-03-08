@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProjects } from '../hooks/usePortfolio';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 // Bento grid layout patterns — each pattern defines spans for a row of cards
 // [colSpan, rowSpan] pairs — designed for a 12-column grid
@@ -148,14 +149,10 @@ export const ProjectsList: React.FC = () => {
       {/* Category Filters */}
       {categories.length > 0 && (
         <div className={`max-w-[1400px] mx-auto px-6 md:px-12 pb-10 transition-all duration-700 delay-200 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap">
             <button
               onClick={() => setSelectedCategory(undefined)}
-              className={`px-5 py-2.5 text-[11px] font-mono uppercase tracking-[0.15em] border transition-all duration-300 whitespace-nowrap ${
-                !selectedCategory
-                  ? 'border-black dark:border-white text-black dark:text-white bg-black dark:bg-white text-white dark:text-black'
-                  : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 dark:text-neutral-600 hover:text-black dark:hover:text-white hover:border-neutral-400 dark:hover:border-neutral-600'
-              }`}
+              className={`blog-filter-tab ${!selectedCategory ? 'active' : ''}`}
             >
               All
             </button>
@@ -163,16 +160,13 @@ export const ProjectsList: React.FC = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2.5 text-[11px] font-mono uppercase tracking-[0.15em] border transition-all duration-300 whitespace-nowrap ${
-                  selectedCategory === category
-                    ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
-                    : 'border-neutral-200 dark:border-neutral-800 text-neutral-400 dark:text-neutral-600 hover:text-black dark:hover:text-white hover:border-neutral-400 dark:hover:border-neutral-600'
-                }`}
+                className={`blog-filter-tab ${selectedCategory === category ? 'active' : ''}`}
               >
                 {category}
               </button>
             ))}
           </div>
+          <div className="h-px bg-neutral-200 dark:bg-neutral-800 mt-2" />
         </div>
       )}
 
@@ -247,10 +241,13 @@ export const ProjectsList: React.FC = () => {
                           <div className={`${layout.aspect} overflow-hidden ${isLarge ? 'h-full' : ''}`}>
                             {project.image_url ? (
                               <img
-                                src={project.image_url}
+                                src={optimizeCloudinaryUrl(project.image_url, 800)}
                                 alt={project.title}
                                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
+                                width={800}
+                                height={450}
                                 loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-neutral-100 dark:bg-neutral-900 text-neutral-400 dark:text-neutral-600 font-mono text-xs uppercase tracking-widest">

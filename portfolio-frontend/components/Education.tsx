@@ -131,7 +131,7 @@ export const Education: React.FC = () => {
 
                   {/* Card */}
                   <div className="md:ml-16 group">
-                    <div className="relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0d0d0d] hover:border-black dark:hover:border-neutral-600 transition-all duration-300">
+                    <div className="relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0d0d0d] hover:border-black dark:hover:border-neutral-600 transition-colors duration-300">
                       {/* Top accent line */}
                       <div className="h-px bg-black dark:bg-white" />
 
@@ -145,6 +145,10 @@ export const Education: React.FC = () => {
                                   src={logo}
                                   alt={edu.institution}
                                   className="w-full h-full object-contain"
+                                  width={64}
+                                  height={64}
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               </div>
                             </div>

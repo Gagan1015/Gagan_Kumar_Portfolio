@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SectionId } from '../types';
 import { useProjects } from '../hooks/usePortfolio';
 import { Link } from 'react-router-dom';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 export const Projects: React.FC = () => {
   const { data: projects, isLoading, error } = useProjects();
@@ -142,9 +143,13 @@ export const Projects: React.FC = () => {
                       {/* Image */}
                       <div className="aspect-[16/9] overflow-hidden border border-neutral-200 dark:border-neutral-800 mb-5">
                         <img
-                          src={project.image_url || 'https://picsum.photos/800/450'}
+                          src={optimizeCloudinaryUrl(project.image_url || '', 800)}
                           alt={project.title}
                           className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                          width={800}
+                          height={450}
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <div className="flex items-start gap-4">
@@ -264,9 +269,12 @@ export const Projects: React.FC = () => {
         >
           <div className="w-full h-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black overflow-hidden shadow-2xl dark:shadow-none">
             <img
-              src={projects.find(p => p.id === hoveredId)?.image_url || 'https://picsum.photos/640/400'}
+              src={optimizeCloudinaryUrl(projects.find(p => p.id === hoveredId)?.image_url || '', 640)}
               alt={`Preview of ${projects.find(p => p.id === hoveredId)?.title || 'project'}`}
               className="w-full h-full object-cover"
+              width={640}
+              height={400}
+              decoding="async"
             />
           </div>
         </div>

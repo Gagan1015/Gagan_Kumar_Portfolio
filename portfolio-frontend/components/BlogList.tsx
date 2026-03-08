@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useBlogs, useBlogCategories } from '../hooks/usePortfolio';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 export const BlogList: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
@@ -179,10 +180,13 @@ export const BlogList: React.FC = () => {
                       <div className="blog-card-image-wrapper">
                         {post.featured_image ? (
                           <img
-                            src={post.featured_image}
+                            src={optimizeCloudinaryUrl(post.featured_image, 600)}
                             alt={post.title}
                             className="blog-card-image"
+                            width={600}
+                            height={375}
                             loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                           <div className="blog-card-image-placeholder">

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useProject, useProjects } from '../hooks/usePortfolio';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 // SEO meta tag helpers
 const updateMetaTag = (attr: string, key: string, value: string) => {
@@ -201,7 +202,7 @@ export const ProjectDetailPage: React.FC = () => {
       {project.image_url && (
         <div className="max-w-6xl mx-auto px-6 md:px-12 mb-12">
           <div className="aspect-[16/9] overflow-hidden border border-neutral-200 dark:border-neutral-800">
-            <img src={project.image_url} alt={project.title} className="w-full h-full object-cover" />
+            <img src={optimizeCloudinaryUrl(project.image_url, 1200)} alt={project.title} className="w-full h-full object-cover" width={1200} height={675} decoding="async" />
           </div>
         </div>
       )}
@@ -245,7 +246,7 @@ export const ProjectDetailPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {project.gallery_images.map((image, index) => (
                     <div key={`${image}-${index}`} className="aspect-[4/3] overflow-hidden border border-neutral-200 dark:border-neutral-800">
-                      <img src={image} alt={`${project.title} screenshot ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                      <img src={optimizeCloudinaryUrl(image, 600)} alt={`${project.title} screenshot ${index + 1}`} className="w-full h-full object-cover" width={600} height={450} loading="lazy" decoding="async" />
                     </div>
                   ))}
                 </div>
@@ -313,7 +314,7 @@ export const ProjectDetailPage: React.FC = () => {
                 <Link key={related.id} to={`/projects/${related.id}`} className="group block">
                   {related.image_url && (
                     <div className="aspect-[16/10] overflow-hidden border border-neutral-200 dark:border-neutral-800 mb-4">
-                      <img src={related.image_url} alt={related.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" loading="lazy" />
+                      <img src={optimizeCloudinaryUrl(related.image_url, 400)} alt={related.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" width={400} height={250} loading="lazy" decoding="async" />
                     </div>
                   )}
                   {related.category && (

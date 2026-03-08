@@ -68,16 +68,25 @@ const CodeTypewriter: React.FC<{ profile: Profile | undefined; techStack: string
     return lines.reduce((sum, line) => sum + line.segments.reduce((s, seg) => s + seg.text.length, 0), 0);
   }, [lines]);
 
-  // Start typing after a delay
+  // Keep a ref so the interval callback always reads the latest totalChars (no stale closure)
+  const totalCharsRef = useRef(totalChars);
+  totalCharsRef.current = totalChars;
+
+  // Start typing after a delay — only once profile data is available
   useEffect(() => {
-    if (startedRef.current) return;
+    if (!profile) return;           // wait for real data before animating
+    if (startedRef.current) return; // only start once per mount
+
+    startedRef.current = true;
+    setCharCount(0); // reset in case of remount
+
     const delay = setTimeout(() => {
-      startedRef.current = true;
       timerRef.current = setInterval(() => {
         setCharCount(prev => {
-          if (prev >= totalChars) {
+          const target = totalCharsRef.current;
+          if (prev >= target) {
             if (timerRef.current) clearInterval(timerRef.current);
-            return totalChars;
+            return target;
           }
           return prev + 1;
         });
@@ -86,8 +95,10 @@ const CodeTypewriter: React.FC<{ profile: Profile | undefined; techStack: string
     return () => {
       clearTimeout(delay);
       if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = null;
+      startedRef.current = false; // allow animation to restart on remount
     };
-  }, [totalChars]);
+  }, [profile]);
 
   // Render lines with partial text reveal
   let charsRemaining = charCount;
@@ -266,9 +277,17 @@ export const Hero: React.FC = () => {
                 <div className="hero-avatar-container">
                   <div className="hero-avatar-glow-ring" />
                   <img
-                    src={profile?.avatar || '/88609526.jpg'}
+                    src={profile?.avatar 
+                      ? (profile.avatar.includes('cloudinary') 
+                          ? profile.avatar.replace('/upload/', '/upload/f_auto,q_auto,w_150,h_150,c_fill/') 
+                          : profile.avatar)
+                      : '/88609526.jpg'}
                     alt={profile?.full_name || 'Profile'}
                     className="hero-avatar-image"
+                    width={76}
+                    height={76}
+                    fetchPriority="high"
+                    decoding="async"
                   />
                 </div>
                 {/* Status dot - outside overflow:hidden container */}

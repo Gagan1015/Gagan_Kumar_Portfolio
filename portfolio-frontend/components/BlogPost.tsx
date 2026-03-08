@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypeHighlight from 'rehype-highlight';
 import { useBlogPost, useBlogs } from '../hooks/usePortfolio';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
 interface TocItem {
   id: string;
@@ -247,9 +248,12 @@ export const BlogPostPage: React.FC = () => {
         <div className="max-w-5xl mx-auto px-6 md:px-12 mb-12">
           <div className="blog-featured-image-wrapper">
             <img
-              src={post.featured_image}
+              src={optimizeCloudinaryUrl(post.featured_image, 1000)}
               alt={post.title}
               className="blog-featured-image"
+              width={1000}
+              height={500}
+              decoding="async"
             />
           </div>
         </div>
@@ -257,7 +261,7 @@ export const BlogPostPage: React.FC = () => {
 
       {/* Content + ToC Layout */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24 relative">
-        <div className="flex gap-12 overflow-hidden">
+        <div className="flex gap-12 items-start">
           {/* Main Content */}
           <div className="flex-1 min-w-0 max-w-4xl mx-auto">
             <div className="blog-prose">
@@ -391,10 +395,13 @@ export const BlogPostPage: React.FC = () => {
                   {related.featured_image && (
                     <div className="aspect-[16/10] overflow-hidden border border-neutral-200 dark:border-neutral-800 mb-4">
                       <img
-                        src={related.featured_image}
+                        src={optimizeCloudinaryUrl(related.featured_image, 400)}
                         alt={related.title}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                        width={400}
+                        height={250}
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   )}
