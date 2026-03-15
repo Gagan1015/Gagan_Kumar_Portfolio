@@ -171,7 +171,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
       {/* ===================== MOBILE FLOATING HEADER (top pill) ===================== */}
       {createPortal(
         <div
-          className={`mobile-header-pill md:hidden ${isScrolled ? 'mobile-header-pill-visible' : 'mobile-header-pill-hidden'}`}
+          className="mobile-header-pill md:hidden mobile-header-pill-visible"
         >
           {/* Section name + dropdown */}
           <button

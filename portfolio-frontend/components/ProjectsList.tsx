@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProjects } from '../hooks/usePortfolio';
 import { optimizeCloudinaryUrl } from '../utils/cloudinary';
@@ -37,9 +37,7 @@ const BENTO_PATTERNS = [
 export const ProjectsList: React.FC = () => {
   const { data: projects, isLoading, error } = useProjects();
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
-  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
   const [headerVisible, setHeaderVisible] = useState(false);
-  const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
   const categories = useMemo(() => {
     if (!projects) return [];
@@ -83,30 +81,6 @@ export const ProjectsList: React.FC = () => {
     const timer = setTimeout(() => setHeaderVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    cardRefs.current.forEach((el, index) => {
-      if (!el) return;
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setVisibleCards((prev) => new Set(prev).add(index));
-            observer.disconnect();
-          }
-        },
-        { threshold: 0.08 }
-      );
-      observer.observe(el);
-      observers.push(observer);
-    });
-
-    return () => observers.forEach((observer) => observer.disconnect());
-  }, [filteredProjects]);
-
-  useEffect(() => {
-    setVisibleCards(new Set());
-  }, [selectedCategory]);
 
   let globalIndex = 0;
 
@@ -221,17 +195,13 @@ export const ProjectsList: React.FC = () => {
                     const layout = group.pattern[itemIndex];
                     const cardIndex = globalIndex++;
                     const num = String(cardIndex + 1).padStart(2, '0');
-                    const isVisible = visibleCards.has(cardIndex);
                     const isLarge = layout.size === 'hero' || layout.size === 'tall';
 
                     return (
                       <article
                         key={project.id}
-                        ref={(el) => { cardRefs.current[cardIndex] = el; }}
-                        className={`group relative ${layout.col} ${layout.row} transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-[0.97]'
-                        }`}
-                        style={{ transitionDelay: `${itemIndex * 100 + 50}ms` }}
+                        className={`group relative ${layout.col} ${layout.row} project-card-enter`}
+                        style={{ animationDelay: `${itemIndex * 100 + 150}ms` }}
                       >
                         <Link
                           to={`/projects/${project.id}`}

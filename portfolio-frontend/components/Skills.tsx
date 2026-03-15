@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { SectionId, Skill } from '../types';
 import { useSkillsGrouped } from '../hooks/usePortfolio';
 
@@ -86,7 +86,7 @@ const SKILL_ICON_MAP: Record<string, { slug: string; type: 'simpleicons' | 'devi
   'storybook': { slug: 'storybook', type: 'devicon' },
   'npm': { slug: 'npm-original-wordmark', type: 'devicon' },
 
-  // Creative / Animation Libraries (use Simple Icons for these)
+  // Creative / Animation Libraries
   'three.js': { slug: 'threedotjs', type: 'simpleicons' },
   'threejs': { slug: 'threedotjs', type: 'simpleicons' },
   'd3.js': { slug: 'd3dotjs', type: 'simpleicons' },
@@ -105,13 +105,12 @@ const SKILL_ICON_MAP: Record<string, { slug: string; type: 'simpleicons' | 'devi
   'ci/cd': { slug: 'githubactions', type: 'simpleicons' },
   'terraform': { slug: 'terraform', type: 'devicon' },
 
-  // System Design (no specific icon, use a generic one)
+  // System Design
   'system design': { slug: 'archlinux', type: 'simpleicons' },
 };
 
 // Official website URLs for each technology
 const SKILL_URL_MAP: Record<string, string> = {
-  // Languages
   'javascript': 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
   'typescript': 'https://www.typescriptlang.org',
   'python': 'https://www.python.org',
@@ -125,8 +124,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'swift': 'https://www.swift.org',
   'kotlin': 'https://kotlinlang.org',
   'dart': 'https://dart.dev',
-
-  // Frontend Frameworks
   'react': 'https://react.dev',
   'react.js': 'https://react.dev',
   'reactjs': 'https://react.dev',
@@ -139,8 +136,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'svelte': 'https://svelte.dev',
   'nuxt.js': 'https://nuxt.com',
   'alpine.js': 'https://alpinejs.dev',
-
-  // Backend & Runtime
   'node.js': 'https://nodejs.org',
   'nodejs': 'https://nodejs.org',
   'express': 'https://expressjs.com',
@@ -150,8 +145,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'laravel': 'https://laravel.com',
   'spring': 'https://spring.io',
   'rails': 'https://rubyonrails.org',
-
-  // Databases
   'mysql': 'https://www.mysql.com',
   'my sql': 'https://www.mysql.com',
   'postgresql': 'https://www.postgresql.org',
@@ -159,8 +152,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'redis': 'https://redis.io',
   'sqlite': 'https://www.sqlite.org',
   'firebase': 'https://firebase.google.com',
-
-  // DevOps & Cloud
   'docker': 'https://www.docker.com',
   'kubernetes': 'https://kubernetes.io',
   'aws': 'https://aws.amazon.com',
@@ -172,8 +163,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'linux': 'https://www.linux.org',
   'git': 'https://git-scm.com',
   'github': 'https://github.com',
-
-  // CSS & Styling
   'css': 'https://developer.mozilla.org/en-US/docs/Web/CSS',
   'css3': 'https://developer.mozilla.org/en-US/docs/Web/CSS',
   'html': 'https://developer.mozilla.org/en-US/docs/Web/HTML',
@@ -184,8 +173,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'tailwind css': 'https://tailwindcss.com',
   'bootstrap': 'https://getbootstrap.com',
   'material ui': 'https://mui.com',
-
-  // Tools & Others
   'figma': 'https://www.figma.com',
   'webpack': 'https://webpack.js.org',
   'vite': 'https://vitejs.dev',
@@ -194,8 +181,6 @@ const SKILL_URL_MAP: Record<string, string> = {
   'jest': 'https://jestjs.io',
   'storybook': 'https://storybook.js.org',
   'npm': 'https://www.npmjs.com',
-
-  // Creative / Animation Libraries
   'three.js': 'https://threejs.org',
   'threejs': 'https://threejs.org',
   'd3.js': 'https://d3js.org',
@@ -204,17 +189,11 @@ const SKILL_URL_MAP: Record<string, string> = {
   'framer motion': 'https://www.framer.com/motion',
   'gsap': 'https://gsap.com',
   'canvas api': 'https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API',
-
-  // Testing
   'jest/vitest': 'https://vitest.dev',
   'vitest': 'https://vitest.dev',
   'cypress': 'https://www.cypress.io',
-
-  // CI/CD & Infrastructure
   'ci/cd': 'https://github.com/features/actions',
   'terraform': 'https://www.terraform.io',
-
-  // Others
   'system design': 'https://github.com/donnemartin/system-design-primer',
   'shad cdn': 'https://ui.shadcn.com',
   'shadcn': 'https://ui.shadcn.com',
@@ -227,10 +206,8 @@ function getSkillUrl(skillName: string): string | null {
 
 function getSkillIconUrl(skillName: string, existingIcon?: string | null): string {
   if (existingIcon) return existingIcon;
-
   const key = skillName.toLowerCase().trim();
   const mapping = SKILL_ICON_MAP[key];
-
   if (mapping) {
     if (mapping.type === 'devicon') {
       return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${mapping.slug}/${mapping.slug}-original.svg`;
@@ -238,155 +215,232 @@ function getSkillIconUrl(skillName: string, existingIcon?: string | null): strin
       return `https://cdn.simpleicons.org/${mapping.slug}`;
     }
   }
-
-  // Fallback: try Simple Icons with the raw name
   const fallbackSlug = skillName.toLowerCase().replace(/[\s.]+/g, '').replace(/[^a-z0-9]/g, '');
   return `https://cdn.simpleicons.org/${fallbackSlug}`;
 }
 
-interface MarqueeRowProps {
-  skills: Skill[];
-  direction: 'left' | 'right';
-  speed?: number;
+// Category order for consistent display
+const CATEGORY_ORDER = [
+  'Languages', 'Frontend', 'Backend', 'Database', 'Databases',
+  'DevOps', 'DevOps & Cloud', 'Tools', 'Tools & Others',
+  'Testing', 'Creative', 'Other',
+];
+
+function getCategoryIndex(category: string): number {
+  const lower = category.toLowerCase();
+  const idx = CATEGORY_ORDER.findIndex(c => c.toLowerCase() === lower || lower.includes(c.toLowerCase()));
+  return idx === -1 ? CATEGORY_ORDER.length : idx;
 }
 
-const MarqueeRow: React.FC<MarqueeRowProps> = ({ skills, direction, speed = 35 }) => {
-  // Repeat items enough times to guarantee no gap on wide screens
-  const items = [...skills, ...skills, ...skills, ...skills];
+// Bento size assignment pattern — repeats for each category's skills
+// 'lg' = 2-col span, 'md' = 1.5-col feel (but stays 1col), 'sm' = 1-col
+// Pattern creates visual rhythm: first item large, then mix
+type BentoSize = 'lg' | 'sm';
 
-  return (
-    <div className="marquee-container group/marquee">
-      <div
-        className={`marquee-track ${direction === 'right' ? 'marquee-reverse' : 'marquee-forward'}`}
-        style={{ '--marquee-speed': `${speed}s` } as React.CSSProperties}
-      >
-        {items.map((skill, index) => {
-          const url = getSkillUrl(skill.name);
-          const CardContent = (
-            <>
-              <div className="skill-icon-wrapper">
-                <img
-                  src={getSkillIconUrl(skill.name, skill.icon)}
-                  alt={`${skill.name} logo`}
-                  className="skill-icon"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent && !parent.querySelector('.skill-icon-fallback')) {
-                      const fallback = document.createElement('div');
-                      fallback.className = 'skill-icon-fallback';
-                      fallback.textContent = skill.name.charAt(0).toUpperCase();
-                      parent.appendChild(fallback);
-                    }
-                  }}
-                />
-              </div>
-              <span className="skill-name">{skill.name}</span>
-            </>
-          );
+function getBentoSize(indexInCategory: number, totalInCategory: number): BentoSize {
+  // First skill in category is always large
+  if (indexInCategory === 0 && totalInCategory > 2) return 'lg';
+  // Every 5th skill gets large to break rhythm
+  if (indexInCategory > 0 && indexInCategory % 5 === 0 && indexInCategory + 1 < totalInCategory) return 'lg';
+  return 'sm';
+}
 
-          return (
-            <div
-              key={`${skill.id}-${index}`}
-              className="marquee-item"
-            >
-              {url ? (
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="skill-card skill-card-link"
-                  title={`Visit ${skill.name} official website`}
-                >
-                  {CardContent}
-                </a>
-              ) : (
-                <div className="skill-card">
-                  {CardContent}
-                </div>
-              )}
-            </div>
-          );
-        })}
+/* ---- Bento Skill Card ---- */
+interface BentoCardProps {
+  skill: Skill;
+  size: BentoSize;
+  index: number;
+  isVisible: boolean;
+  category: string;
+}
 
+const BentoCard: React.FC<BentoCardProps> = ({ skill, size, index, isVisible, category }) => {
+  const url = getSkillUrl(skill.name);
+
+  const inner = (
+    <div
+      className={`bento-card ${isVisible ? 'bento-card-visible' : ''}`}
+      style={{ transitionDelay: isVisible ? `${index * 50}ms` : '0ms' }}
+    >
+      {/* Icon */}
+      <div className="bento-card-icon">
+        <img
+          src={getSkillIconUrl(skill.name, skill.icon)}
+          alt={`${skill.name} logo`}
+          className="bento-card-img"
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const parent = target.parentElement;
+            if (parent && !parent.querySelector('.bento-card-fallback')) {
+              const fb = document.createElement('div');
+              fb.className = 'bento-card-fallback';
+              fb.textContent = skill.name.charAt(0).toUpperCase();
+              parent.appendChild(fb);
+            }
+          }}
+        />
       </div>
+
+      {/* Name */}
+      <div className="bento-card-text">
+        <span className="bento-card-name">{skill.name}</span>
+      </div>
+
+      {/* Link arrow */}
+      {url && (
+        <svg className="bento-card-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="7" y1="17" x2="17" y2="7" />
+          <polyline points="7 7 17 7 17 17" />
+        </svg>
+      )}
     </div>
   );
-};
 
-export const Skills: React.FC = () => {
-  const { data: skillsGrouped, isLoading, error } = useSkillsGrouped();
-
-  // Flatten all skills and split into two rows
-  const { row1, row2 } = useMemo(() => {
-    if (!skillsGrouped) return { row1: [], row2: [] };
-
-    const allSkills = Object.values(skillsGrouped).flat();
-    const mid = Math.ceil(allSkills.length / 2);
-
-    return {
-      row1: allSkills.slice(0, mid),
-      row2: allSkills.slice(mid),
-    };
-  }, [skillsGrouped]);
-
-  if (isLoading) {
+  if (url) {
     return (
-      <section id={SectionId.Skills} className="skills-section">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="skills-header">
-            <h2 className="font-display text-4xl font-medium tracking-tight mb-6 text-black dark:text-white">
-              TECHNICAL<br />SKILLS<span className="text-neutral-300 dark:text-neutral-700">.</span>
-            </h2>
-          </div>
-          <div className="space-y-6 animate-pulse">
-            <div className="h-28 bg-neutral-200 dark:bg-neutral-800 rounded-2xl"></div>
-            <div className="h-28 bg-neutral-200 dark:bg-neutral-800 rounded-2xl"></div>
-          </div>
-        </div>
-      </section>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`bento-card-link bento-span-${size}`}
+        title={`Visit ${skill.name}`}
+      >
+        {inner}
+      </a>
     );
   }
 
-  if (error || !skillsGrouped) {
-    return (
-      <section id={SectionId.Skills} className="skills-section">
+  return <div className={`bento-span-${size}`}>{inner}</div>;
+};
+
+/* ---- Main Skills Section ---- */
+export const Skills: React.FC = () => {
+  const { data: skillsGrouped, isLoading, error } = useSkillsGrouped();
+  const sectionRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+  const [gridVisible, setGridVisible] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { setHeaderVisible(true); observer.disconnect(); }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { setGridVisible(true); observer.disconnect(); }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [skillsGrouped]);
+
+  // Sort categories, flatten into bento items with size assignments
+  const bentoItems = useMemo(() => {
+    if (!skillsGrouped) return [];
+    const sorted = Object.entries(skillsGrouped)
+      .sort(([a], [b]) => getCategoryIndex(a) - getCategoryIndex(b));
+
+    const items: { skill: Skill; size: BentoSize; category: string }[] = [];
+    for (const [category, skills] of sorted) {
+      // Sort by proficiency descending within category
+      const catSkills = [...skills].sort((a, b) => b.proficiency_level - a.proficiency_level);
+      catSkills.forEach((skill, i) => {
+        items.push({
+          skill,
+          size: getBentoSize(i, catSkills.length),
+          category,
+        });
+      });
+    }
+    return items;
+  }, [skillsGrouped]);
+
+  const totalSkills = bentoItems.length;
+
+  const renderContent = useCallback(() => {
+    if (isLoading) {
+      return (
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="skills-header-block">
+            <h2 className="font-display text-4xl font-medium tracking-tight mb-6 text-black dark:text-white">
+              TECHNICAL SKILLS<span className="text-neutral-300 dark:text-neutral-700">.</span>
+            </h2>
+          </div>
+          <div className="bento-grid animate-pulse">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+              <div key={i} className={`h-20 bg-neutral-100 dark:bg-neutral-900 rounded-xl ${i <= 2 ? 'bento-span-lg' : 'bento-span-sm'}`} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (error || !skillsGrouped) {
+      return (
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <p className="text-red-500">Error loading skills. Please try again later.</p>
         </div>
-      </section>
-    );
-  }
+      );
+    }
 
-  return (
-    <section id={SectionId.Skills} className="skills-section">
+    return (
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Section Header */}
-        <div className="skills-header">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
-            <div>
+        <div className={`skills-header-block ${headerVisible ? 'skills-header-visible' : ''}`}>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16 md:mb-20">
+            <div className="md:col-span-5">
               <h2 className="font-display text-4xl md:text-5xl font-medium tracking-tight text-black dark:text-white">
                 TECHNICAL<br />SKILLS<span className="text-neutral-300 dark:text-neutral-700">.</span>
               </h2>
-              <div className="w-12 h-1 bg-black dark:bg-white mt-6 mb-4"></div>
-              <p className="text-neutral-500 dark:text-neutral-400 max-w-md text-sm leading-relaxed">
+              <div className="h-px w-12 bg-black dark:bg-white mt-4" />
+              <p className="text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600 mt-4">
+                {totalSkills} Technologies
+              </p>
+            </div>
+            <div className="md:col-span-7 md:flex md:items-end md:justify-end">
+              <p className="text-neutral-500 dark:text-neutral-400 text-lg leading-relaxed md:max-w-md md:text-right">
                 A toolkit refined over years of building scalable applications and immersive web experiences.
               </p>
             </div>
-            <p className="font-mono text-xs uppercase tracking-widest text-neutral-400 dark:text-neutral-600 hidden md:block">
-              Hover to explore
-            </p>
           </div>
         </div>
-      </div>
 
-      {/* Full-width marquee area */}
-      <div className="marquee-wrapper">
-        <MarqueeRow skills={row1} direction="left" speed={40} />
-        <MarqueeRow skills={row2} direction="right" speed={45} />
+        {/* Bento Grid */}
+        <div ref={gridRef} className="bento-grid">
+          {bentoItems.map((item, i) => (
+            <BentoCard
+              key={item.skill.id}
+              skill={item.skill}
+              size={item.size}
+              index={i}
+              isVisible={gridVisible}
+              category={item.category}
+            />
+          ))}
+        </div>
       </div>
+    );
+  }, [isLoading, error, skillsGrouped, headerVisible, gridVisible, totalSkills, bentoItems]);
+
+  return (
+    <section ref={sectionRef} id={SectionId.Skills} className="skills-section">
+      {renderContent()}
     </section>
   );
 };
