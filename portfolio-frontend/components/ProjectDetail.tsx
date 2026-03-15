@@ -99,7 +99,7 @@ export const ProjectDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="project-detail-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
-        <div className="max-w-5xl mx-auto px-6 md:px-12 pt-28 md:pt-32 pb-24 animate-pulse">
+        <div className="max-w-5xl mx-auto px-6 md:px-12 pt-6 md:pt-32 pb-24 animate-pulse">
           <div className="h-4 w-28 bg-neutral-100 dark:bg-neutral-900 mb-8" />
           <div className="h-10 w-2/3 bg-neutral-100 dark:bg-neutral-900 mb-6" />
           <div className="aspect-[16/9] bg-neutral-100 dark:bg-neutral-900 mb-12" />
@@ -116,7 +116,7 @@ export const ProjectDetailPage: React.FC = () => {
   if (error || !project) {
     return (
       <div className="project-detail-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
-        <div className="max-w-5xl mx-auto px-6 md:px-12 pt-28 md:pt-32 pb-24">
+        <div className="max-w-5xl mx-auto px-6 md:px-12 pt-6 md:pt-32 pb-24">
           <Link to="/projects" className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors mb-12 group">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:-translate-x-1">
               <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -137,7 +137,7 @@ export const ProjectDetailPage: React.FC = () => {
 
   return (
     <div className="project-detail-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
-      <div className="max-w-5xl mx-auto px-6 md:px-12 pt-28 md:pt-32 pb-10">
+      <div className="max-w-5xl mx-auto px-6 md:px-12 pt-6 md:pt-32 pb-10">
         <Link
           to="/projects"
           className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 mb-10 group"

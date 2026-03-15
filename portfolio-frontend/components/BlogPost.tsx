@@ -152,7 +152,7 @@ export const BlogPostPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="blog-post-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
-        <div className="max-w-4xl mx-auto px-6 md:px-12 pt-28 md:pt-32 pb-24 animate-pulse">
+        <div className="max-w-4xl mx-auto px-6 md:px-12 pt-6 md:pt-32 pb-24 animate-pulse">
           <div className="h-4 w-24 bg-neutral-100 dark:bg-neutral-900 mb-8" />
           <div className="h-8 w-3/4 bg-neutral-100 dark:bg-neutral-900 mb-4" />
           <div className="h-6 w-1/2 bg-neutral-100 dark:bg-neutral-900 mb-8" />
@@ -170,7 +170,7 @@ export const BlogPostPage: React.FC = () => {
   if (error || !post) {
     return (
       <div className="blog-post-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
-        <div className="max-w-4xl mx-auto px-6 md:px-12 pt-28 md:pt-32 pb-24">
+        <div className="max-w-4xl mx-auto px-6 md:px-12 pt-6 md:pt-32 pb-24">
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors mb-12 group">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:-translate-x-1">
               <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -192,7 +192,7 @@ export const BlogPostPage: React.FC = () => {
   return (
     <div className="blog-post-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
       {/* Header area */}
-      <div className="max-w-4xl mx-auto px-6 md:px-12 pt-28 md:pt-32">
+      <div className="max-w-4xl mx-auto px-6 md:px-12 pt-6 md:pt-32">
         {/* Back link */}
         <Link 
           to="/blog" 

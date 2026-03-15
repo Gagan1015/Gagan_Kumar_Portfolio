@@ -264,7 +264,7 @@ export const Hero: React.FC = () => {
       <div className="hero-glow-2 absolute w-[400px] h-[400px] rounded-full pointer-events-none bottom-[-120px] left-[-60px]" />
 
       {/* Main content — same max-w and px as all other sections */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full py-32 md:py-40 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full py-16 md:py-40 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
           {/* ─── LEFT COLUMN (Content) ─── */}

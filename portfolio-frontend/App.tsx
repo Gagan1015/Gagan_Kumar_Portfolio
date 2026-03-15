@@ -1,9 +1,10 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { SEOHead } from './components/SEOHead';
+import { Preloader } from './components/Preloader';
 import { SectionId, Theme } from './types';
 import { useProfile } from './hooks/usePortfolio';
 
@@ -59,56 +60,93 @@ const queryClient = new QueryClient({
   },
 });
 
-// Theme Provider Hook
+// Theme Provider Hook — with clip-path circle expand transition
 const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>('system');
+  // On first visit (no localStorage), detect system preference
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem('theme') as Theme | null;
+    if (saved === 'light' || saved === 'dark') return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
+  // Ref to track the triggering element for clip-path origin
+  const toggleOriginRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
-    
+    root.classList.add(theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    if (theme !== 'system') return;
+  const toggleTheme = useCallback((e?: React.MouseEvent) => {
+    const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      const root = window.document.documentElement;
-      root.classList.remove('light', 'dark');
-      root.classList.add(mediaQuery.matches ? 'dark' : 'light');
-    };
+    // Capture click origin for the clip-path circle center
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    if (e) {
+      x = e.clientX;
+      y = e.clientY;
+    }
+    toggleOriginRef.current = { x, y };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    // Calculate the max radius needed to cover the entire viewport
+    const maxRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    // Use View Transitions API if available (Chrome 111+, Edge 111+)
+    if (document.startViewTransition) {
+      // Disable default view-transition morph so we control the animation
+      document.startViewTransition(() => {
+        setTheme(newTheme);
+      }).ready.then(() => {
+        // Animate the new snapshot with an expanding circle clip-path
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${maxRadius}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 500,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            pseudoElement: '::view-transition-new(root)',
+          }
+        );
+      });
+    } else {
+      // Fallback: manual overlay with clip-path animation
+      const overlay = document.createElement('div');
+      overlay.className = 'theme-transition-overlay';
+      overlay.style.setProperty('--tx', `${x}px`);
+      overlay.style.setProperty('--ty', `${y}px`);
+      overlay.style.setProperty('--tr', `${maxRadius}px`);
+      // Set overlay bg to the target theme's background
+      overlay.style.background = newTheme === 'dark' ? '#0a0a0a' : '#ffffff';
+      document.body.appendChild(overlay);
+
+      // Trigger animation
+      requestAnimationFrame(() => {
+        overlay.classList.add('theme-transition-expanding');
+        // Apply theme at midpoint
+        setTimeout(() => setTheme(newTheme), 250);
+        // Remove overlay when animation completes
+        overlay.addEventListener('animationend', () => {
+          overlay.remove();
+        });
+      });
+    }
   }, [theme]);
 
-  const cycleTheme = () => {
-    if (theme === 'light') setTheme('dark');
-    else if (theme === 'dark') setTheme('system');
-    else setTheme('light');
-  };
-
-  return { theme, cycleTheme };
+  return { theme, toggleTheme };
 };
 
 // Portfolio Home Page
-const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: string) => void; theme: Theme; onToggleTheme: () => void }> = ({ 
+const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: string) => void; theme: Theme; onToggleTheme: (e?: React.MouseEvent) => void }> = ({ 
   activeSection, setActiveSection, theme, onToggleTheme 
 }) => {
   const { data: profile } = useProfile();
@@ -155,13 +193,15 @@ const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: str
       <Suspense fallback={null}>
         <Footer />
       </Suspense>
-      <AIChatLauncher />
+      <div className="hidden md:block">
+        <AIChatLauncher />
+      </div>
     </div>
   );
 };
 
 // Content Layout Wrapper (includes Header + Footer)
-const ContentLayout: React.FC<{ children: React.ReactNode; theme: Theme; onToggleTheme: () => void; activeNav: string }> = ({
+const ContentLayout: React.FC<{ children: React.ReactNode; theme: Theme; onToggleTheme: (e?: React.MouseEvent) => void; activeNav: string }> = ({
   children, theme, onToggleTheme, activeNav
 }) => {
   return (
@@ -175,13 +215,36 @@ const ContentLayout: React.FC<{ children: React.ReactNode; theme: Theme; onToggl
   );
 };
 
+// Scroll to top on route change
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
+
 const AppContent: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>(SectionId.Hero);
-  const { theme, cycleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
+
+  // Show preloader on every home page load
+  const isHome = location.pathname === '/';
+  const [showPreloader, setShowPreloader] = useState(isHome);
+
+  const handlePreloaderComplete = useCallback(() => {
+    setShowPreloader(false);
+  }, []);
 
   return (
-    <Suspense fallback={<div className="min-h-screen" />}>
-      <Routes>
+    <>
+      <ScrollToTop />
+      {showPreloader && <Preloader onComplete={handlePreloaderComplete} />}
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <Routes>
         <Route 
           path="/" 
           element={
@@ -189,14 +252,14 @@ const AppContent: React.FC = () => {
               activeSection={activeSection} 
               setActiveSection={setActiveSection} 
               theme={theme} 
-              onToggleTheme={cycleTheme} 
+              onToggleTheme={toggleTheme} 
             />
           } 
         />
         <Route 
           path="/blog" 
           element={
-            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
+            <ContentLayout theme={theme} onToggleTheme={toggleTheme} activeNav="blog">
               <SEOHead 
                 title="Blog — Gagan Kumar | Full-Stack Developer"
                 description="Read blog posts by Gagan Kumar on web development, React, TypeScript, Laravel, PHP, and modern software engineering topics."
@@ -209,7 +272,7 @@ const AppContent: React.FC = () => {
         <Route 
           path="/blog/:slug" 
           element={
-            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="blog">
+            <ContentLayout theme={theme} onToggleTheme={toggleTheme} activeNav="blog">
               <BlogPostPage />
             </ContentLayout>
           } 
@@ -217,7 +280,7 @@ const AppContent: React.FC = () => {
         <Route
           path="/projects"
           element={
-            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
+            <ContentLayout theme={theme} onToggleTheme={toggleTheme} activeNav="projects">
               <SEOHead 
                 title="Projects — Gagan Kumar | Full-Stack Developer"
                 description="Explore projects by Gagan Kumar — web applications, APIs, design systems, and experiments built with React, TypeScript, Laravel, and more."
@@ -230,13 +293,14 @@ const AppContent: React.FC = () => {
         <Route
           path="/projects/:id"
           element={
-            <ContentLayout theme={theme} onToggleTheme={cycleTheme} activeNav="projects">
+            <ContentLayout theme={theme} onToggleTheme={toggleTheme} activeNav="projects">
               <ProjectDetailPage />
             </ContentLayout>
           } 
         />
       </Routes>
     </Suspense>
+    </>
   );
 };
 

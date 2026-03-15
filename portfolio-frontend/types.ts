@@ -121,4 +121,4 @@ export interface ChatMessage {
   isThinking?: boolean;
 }
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark';

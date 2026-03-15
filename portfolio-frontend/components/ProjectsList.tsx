@@ -113,7 +113,7 @@ export const ProjectsList: React.FC = () => {
   return (
     <div className="projects-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
       {/* Back link */}
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 pt-28 md:pt-32">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 pt-6 md:pt-32">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 group"
