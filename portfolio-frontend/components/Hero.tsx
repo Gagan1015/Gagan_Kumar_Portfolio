@@ -153,23 +153,11 @@ export const Hero: React.FC = () => {
   return (
     <section
       id={SectionId.Hero}
-      className="hero-section relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-[#0a0a0a] border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300"
+      className="hero-section relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-300"
     >
-      {/* Grid background */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
-        style={{
-          backgroundImage: 'linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(to right, var(--grid-color) 1px, transparent 1px)',
-          backgroundSize: '50px 50px',
-        }}
-      />
-
-      {/* Ambient glow */}
-      <div className="hero-glow-1 absolute w-[500px] h-[500px] rounded-full pointer-events-none top-[-150px] right-[-80px]" />
-      <div className="hero-glow-2 absolute w-[400px] h-[400px] rounded-full pointer-events-none bottom-[-120px] left-[-60px]" />
-
       {/* Main content — two column on desktop */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full py-16 md:py-24 relative z-10">
+      <div className="section-frame w-full">
+        <div className="section-frame-inner w-full py-16 md:py-24 relative z-10">
         <div className="flex flex-col lg:flex-row lg:items-center lg:gap-16 xl:gap-20">
 
           {/* ─── Left column: Text content ─── */}
@@ -178,7 +166,8 @@ export const Hero: React.FC = () => {
             {/* Mobile/Tablet avatar — top of hero on small screens */}
             <div className={`mb-8 flex justify-center lg:hidden hero-phase hero-phase-visual ${phase >= 1 ? 'hero-phase-visible' : ''}`}>
               <div className="hero-mobile-avatar">
-                <div className="hero-mobile-avatar-ring" />
+                <div className="hero-visual-avatar-glow" />
+                <div className="hero-avatar-accent-arc" />
                 <img
                   src={profile?.avatar
                     ? (profile.avatar.includes('cloudinary')
@@ -378,6 +367,7 @@ export const Hero: React.FC = () => {
               <div ref={avatarTiltRef} className="hero-visual-avatar-wrap hero-avatar-tilt">
                 <div className="hero-visual-avatar">
                   <div className="hero-visual-avatar-glow" />
+                  <div className="hero-avatar-accent-arc" />
                   <img
                     src={profile?.avatar
                       ? (profile.avatar.includes('cloudinary')
@@ -423,6 +413,7 @@ export const Hero: React.FC = () => {
           </div>
 
         </div>
+      </div>
       </div>
 
       {/* Scroll indicator */}

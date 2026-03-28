@@ -56,8 +56,9 @@ export const Education: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section id={SectionId.Education} className="py-24 md:py-32 px-6 md:px-12 bg-neutral-50 dark:bg-geo-dark-card transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
+      <section id={SectionId.Education} className="bg-neutral-50 py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
+        <div className="section-frame">
+          <div className="section-frame-inner">
           <h2 className="font-display text-4xl font-medium tracking-tight mb-6 text-black dark:text-white">
             EDUCATION<span className="text-neutral-300 dark:text-neutral-700">.</span>
           </h2>
@@ -66,6 +67,7 @@ export const Education: React.FC = () => {
               <div key={i} className="h-28 bg-neutral-200 dark:bg-neutral-800"></div>
             ))}
           </div>
+          </div>
         </div>
       </section>
     );
@@ -73,19 +75,22 @@ export const Education: React.FC = () => {
 
   if (error || !education) {
     return (
-      <section id={SectionId.Education} className="py-24 md:py-32 px-6 md:px-12 bg-neutral-50 dark:bg-geo-dark-card transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
+      <section id={SectionId.Education} className="bg-neutral-50 py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
+        <div className="section-frame">
+          <div className="section-frame-inner">
           <p className="text-neutral-500">Error loading education data. Please try again later.</p>
+          </div>
         </div>
       </section>
     );
   }
 
   return (
-    <section id={SectionId.Education} className="py-24 md:py-32 px-6 md:px-12 bg-neutral-50 dark:bg-geo-dark-card transition-colors duration-300 border-b border-neutral-200 dark:border-geo-dark-border">
-      <div className="max-w-7xl mx-auto">
+    <section id={SectionId.Education} className="bg-neutral-50 py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
+      <div className="section-frame">
+        <div className="section-frame-inner">
         {/* Section Header */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16">
+        <div className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8">
           <div className="md:col-span-4">
             <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
               EDUCATION<span className="text-neutral-300 dark:text-neutral-700">.</span>
@@ -215,6 +220,7 @@ export const Education: React.FC = () => {
 
           {/* Timeline end cap */}
           <div className="hidden md:block absolute left-[26px] bottom-0 w-[6px] h-[6px] bg-neutral-300 dark:bg-neutral-700" />
+        </div>
         </div>
       </div>
     </section>

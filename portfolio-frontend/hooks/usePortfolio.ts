@@ -57,16 +57,6 @@ export const useProjects = (params?: { category?: string; featured?: boolean }):
   });
 };
 
-export const useProject = (id: string): UseQueryResult<Project, Error> => {
-  return useQuery({
-    queryKey: ['project', id],
-    queryFn: () => projectService.getById(id),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    enabled: !!id,
-  });
-};
-
 // Skills Hook
 export const useSkills = (params?: { category?: string; grouped?: boolean }): UseQueryResult<Skill[] | Record<string, Skill[]>, Error> => {
   return useQuery({

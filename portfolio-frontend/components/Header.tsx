@@ -105,8 +105,8 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
       <header
         className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 hidden md:block ${
           isScrolled
-            ? 'bg-white/90 dark:bg-geo-dark-bg/90 backdrop-blur-md border-b border-neutral-200 dark:border-geo-dark-border py-3'
-            : 'bg-transparent py-6'
+            ? 'bg-white/90 dark:bg-geo-dark-bg/90 backdrop-blur-md md:border-b md:border-neutral-200 dark:md:border-geo-dark-border py-3'
+            : 'bg-transparent md:border-b md:border-neutral-200/80 dark:md:border-geo-dark-border/80 py-6'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">

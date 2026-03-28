@@ -184,10 +184,11 @@ export const Footer: React.FC = () => {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-neutral-50 dark:bg-[#050505] text-neutral-900 dark:text-white overflow-hidden border-t border-neutral-200 dark:border-neutral-800 transition-colors duration-300 pb-24 md:pb-0"
+      className="relative bg-neutral-50 dark:bg-[#050505] text-neutral-900 dark:text-white overflow-hidden transition-colors duration-300 pb-24 md:pb-0"
     >
       {/* ─── Main content ─── */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-12">
+      <div className="section-frame">
+        <div className="section-frame-inner pb-10 pt-14 md:pb-12 md:pt-24">
 
         {/* ROW 1: Big CTA */}
         <div
@@ -207,7 +208,7 @@ export const Footer: React.FC = () => {
 
         {/* Divider */}
         <div
-          className={`footer-divider my-12 md:my-16 transition-all duration-700 ease-out delay-100 ${
+          className={`footer-divider my-10 md:my-16 transition-all duration-700 ease-out delay-100 ${
             isVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
           }`}
         />
@@ -316,9 +317,9 @@ export const Footer: React.FC = () => {
 
         {/* ─── Bottom bar ─── */}
         <div
-          className={`mt-16 md:mt-20 pt-6 border-t border-neutral-200/60 dark:border-neutral-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all duration-700 ease-out delay-300 ${
+          className={`mt-12 border-t border-neutral-200/60 pt-6 transition-all duration-700 ease-out delay-300 dark:border-neutral-800/60 md:mt-20 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
+          } flex flex-col items-start justify-between gap-4 md:flex-row md:items-center`}
         >
           <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-6">
             <span className="text-[11px] font-mono text-neutral-500 dark:text-neutral-500">
@@ -342,6 +343,7 @@ export const Footer: React.FC = () => {
               </svg>
             </span>
           </button>
+        </div>
         </div>
       </div>
 

@@ -3,14 +3,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { Profile } from './components/Profile';
+import { Experience } from './components/Experience';
 import { SEOHead } from './components/SEOHead';
 import { Preloader } from './components/Preloader';
 import { SectionId, Theme } from './types';
 import { useProfile } from './hooks/usePortfolio';
 
 // Lazy-load below-the-fold home sections to reduce initial JS payload
-const Profile = lazy(() => import('./components/Profile').then(m => ({ default: m.Profile })));
-const Experience = lazy(() => import('./components/Experience').then(m => ({ default: m.Experience })));
 const Projects = lazy(() => import('./components/Projects').then(m => ({ default: m.Projects })));
 const Skills = lazy(() => import('./components/Skills').then(m => ({ default: m.Skills })));
 const Education = lazy(() => import('./components/Education').then(m => ({ default: m.Education })));
@@ -45,7 +45,6 @@ const AIChatLauncher: React.FC = () => {
 const BlogList = lazy(() => import('./components/BlogList').then(m => ({ default: m.BlogList })));
 const BlogPostPage = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPostPage })));
 const ProjectsList = lazy(() => import('./components/ProjectsList').then(m => ({ default: m.ProjectsList })));
-const ProjectDetailPage = lazy(() => import('./components/ProjectDetail').then(m => ({ default: m.ProjectDetailPage })));
 
 // Create QueryClient instance
 const queryClient = new QueryClient({
@@ -59,6 +58,21 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const SectionDivider: React.FC = () => {
+  return (
+    <div className="relative z-[1] hidden h-7 lg:block" aria-hidden="true">
+      <div className="absolute inset-0">
+        <div className="absolute inset-x-0 top-[4px] h-px bg-black/[0.10] dark:bg-white/[0.12]" />
+        <div className="absolute inset-x-0 bottom-[4px] h-px bg-black/[0.08] dark:bg-white/[0.10]" />
+        <div className="absolute inset-x-0 top-[5px] bottom-[5px] overflow-hidden">
+          <div className="absolute inset-0 bg-[repeating-linear-gradient(-45deg,rgba(17,17,17,0.065)_0px,rgba(17,17,17,0.065)_1px,transparent_1px,transparent_8px)] dark:bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.055)_0px,rgba(255,255,255,0.055)_1px,transparent_1px,transparent_8px)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.62),rgba(255,255,255,0),rgba(255,255,255,0.62))] opacity-50 dark:bg-[linear-gradient(180deg,rgba(0,0,0,0.38),rgba(0,0,0,0),rgba(0,0,0,0.38))] dark:opacity-70" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Theme Provider Hook — with clip-path circle expand transition
 const useTheme = () => {
@@ -173,23 +187,29 @@ const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: str
   }, [setActiveSection]);
 
   return (
-    <div className="bg-white dark:bg-geo-dark-bg min-h-screen selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
+    <div className="relative isolate min-h-screen bg-white selection:bg-black selection:text-white transition-colors duration-300 dark:bg-geo-dark-bg dark:selection:bg-white dark:selection:text-black">
       <SEOHead 
         title={`${profile?.full_name || 'Gagan Kumar'} — Full-Stack Developer Portfolio`}
         description="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog."
         url="https://gagankumar.me/"
       />
       <Header activeSection={activeSection} theme={theme} onToggleTheme={onToggleTheme} />
-      <main>
+      <main className="relative z-[1]">
         <Hero />
+        <SectionDivider />
+        <Profile />
+        <SectionDivider />
+        <Experience />
+        <SectionDivider />
         <Suspense fallback={<div className="min-h-screen" />}>
-          <Profile />
-          <Experience />
           <Skills />
+          <SectionDivider />
           <Projects />
+          <SectionDivider />
           <Education />
         </Suspense>
       </main>
+      <SectionDivider />
       <Suspense fallback={null}>
         <Footer />
       </Suspense>
@@ -205,9 +225,10 @@ const ContentLayout: React.FC<{ children: React.ReactNode; theme: Theme; onToggl
   children, theme, onToggleTheme, activeNav
 }) => {
   return (
-    <div className="bg-white dark:bg-geo-dark-bg min-h-screen selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
+    <div className="relative isolate min-h-screen bg-white selection:bg-black selection:text-white transition-colors duration-300 dark:bg-geo-dark-bg dark:selection:bg-white dark:selection:text-black">
       <Header activeSection={activeNav} theme={theme} onToggleTheme={onToggleTheme} />
-      {children}
+      <div className="relative z-[1]">{children}</div>
+      <SectionDivider />
       <Suspense fallback={null}>
         <Footer />
       </Suspense>
@@ -289,14 +310,6 @@ const AppContent: React.FC = () => {
               <ProjectsList />
             </ContentLayout>
           }
-        />
-        <Route
-          path="/projects/:id"
-          element={
-            <ContentLayout theme={theme} onToggleTheme={toggleTheme} activeNav="projects">
-              <ProjectDetailPage />
-            </ContentLayout>
-          } 
         />
       </Routes>
     </Suspense>

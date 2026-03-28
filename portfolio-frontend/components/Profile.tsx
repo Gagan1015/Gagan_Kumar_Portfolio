@@ -1,18 +1,21 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useProfile, useSkillsGrouped } from '../hooks/usePortfolio';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { SectionId } from '../types';
-import { useProfile } from '../hooks/usePortfolio';
-import { useSkillsGrouped } from '../hooks/usePortfolio';
 
-// Animated counter hook — uses callback ref to handle late-mounting elements
-function useCountUp(target: number, duration: number = 2000) {
-  const [count, setCount] = useState(0);
+function useCountUp(target: number, duration: number, prefersReducedMotion: boolean) {
+  const [count, setCount] = useState(prefersReducedMotion ? target : 0);
   const hasAnimated = useRef(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Callback ref: fires when the DOM element is attached/detached
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setCount(target);
+    }
+  }, [prefersReducedMotion, target]);
+
   const ref = useCallback(
     (node: HTMLDivElement | null) => {
-      // Cleanup previous observer
       if (observerRef.current) {
         observerRef.current.disconnect();
         observerRef.current = null;
@@ -22,91 +25,164 @@ function useCountUp(target: number, duration: number = 2000) {
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting && !hasAnimated.current) {
-            hasAnimated.current = true;
-            observer.disconnect();
+          if (!entry.isIntersecting || hasAnimated.current) return;
 
-            let start = 0;
-            const step = target / (duration / 16);
-            const timer = setInterval(() => {
-              start += step;
-              if (start >= target) {
-                setCount(target);
-                clearInterval(timer);
-              } else {
-                setCount(Math.floor(start));
-              }
-            }, 16);
+          hasAnimated.current = true;
+          observer.disconnect();
+
+          if (prefersReducedMotion) {
+            setCount(target);
+            return;
           }
+
+          let start = 0;
+          const step = target / (duration / 16);
+          const timer = window.setInterval(() => {
+            start += step;
+            if (start >= target) {
+              setCount(target);
+              window.clearInterval(timer);
+            } else {
+              setCount(Math.floor(start));
+            }
+          }, 16);
         },
-        { threshold: 0.3 }
+        { threshold: 0.35 }
       );
 
       observer.observe(node);
       observerRef.current = observer;
     },
-    [target, duration]
+    [duration, prefersReducedMotion, target]
   );
 
   return { count, ref };
 }
 
-// Highlights keywords in summary text
 function highlightKeywords(text: string): React.ReactNode[] {
   const keywords = [
-    'Laravel', 'PHP', 'JavaScript', 'WordPress', 'React', 'TypeScript',
-    'Next.js', 'Node.js', 'Python', 'Vue.js', 'Angular', 'Docker',
-    'AWS', 'GraphQL', 'MongoDB', 'PostgreSQL', 'MySQL', 'Redis',
-    'backend', 'frontend', 'full-stack', 'full stack', 'web applications',
-    'data structures', 'algorithms', 'problem-solving',
-    'responsive', 'dynamic', 'scalable', 'APIs', 'databases',
-    'server-side programming', 'backend engineering', 'backend development',
-    'Computer Science Engineering',
+    'Full-Stack',
+    'Laravel',
+    'PHP',
+    'Node.js',
+    'MySQL',
+    'REST APIs',
+    'APIs',
+    'SaaS applications',
+    'dynamic',
+    'frontend',
+    'backend',
+    'scalable',
   ];
 
-  // Sort by length (longest first) to avoid partial matches
   const sorted = [...keywords].sort((a, b) => b.length - a.length);
-  const regex = new RegExp(`(${sorted.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+  const regex = new RegExp(`(${sorted.map((keyword) => keyword.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')).join('|')})`, 'gi');
 
-  const parts = text.split(regex);
-  return parts.map((part, i) => {
-    const isKeyword = sorted.some(k => k.toLowerCase() === part.toLowerCase());
-    if (isKeyword) {
-      return (
-        <span
-          key={i}
-          className="profile-keyword"
-        >
-          {part}
-        </span>
-      );
+  return text.split(regex).map((part, index) => {
+    const isKeyword = sorted.some((keyword) => keyword.toLowerCase() === part.toLowerCase());
+
+    if (!isKeyword) {
+      return <span key={index}>{part}</span>;
     }
-    return <span key={i}>{part}</span>;
+
+    return (
+      <span
+        key={index}
+        className="underline decoration-2 underline-offset-[0.18em] decoration-[#e27933]/70 dark:decoration-[#f0a35d]/70"
+      >
+        {part}
+      </span>
+    );
   });
 }
 
 export const Profile: React.FC = () => {
   const { data: profile, isLoading, error } = useProfile();
   const { data: skillsGrouped } = useSkillsGrouped();
-  const [hoveredStat, setHoveredStat] = useState<string | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Hardcoded stats with count-up animation
-  const { count: yearsCount, ref: yearsRef } = useCountUp(1, 1500);
-  const { count: skillsCount, ref: skillsRef } = useCountUp(10, 1800);
-  const { count: categoriesCount, ref: categoriesRef } = useCountUp(3, 1200);
+  const availabilityStatus = profile?.availability_status ?? 'available';
+  const availabilityTone = availabilityStatus === 'available'
+    ? 'bg-emerald-500'
+    : availabilityStatus === 'busy'
+      ? 'bg-amber-500'
+      : 'bg-rose-500';
+  const availabilityText = availabilityStatus === 'available'
+    ? 'Open to Work'
+    : availabilityStatus === 'busy'
+      ? 'Busy'
+      : 'Unavailable';
+
+  const skillGroups = useMemo(() => Object.entries(skillsGrouped ?? {}), [skillsGrouped]);
+  const techCount = skillGroups.reduce((total, [, skills]) => total + skills.length, 0) || 10;
+  const domainCount = skillGroups.length || 3;
+  const spotlightDomains = [...skillGroups]
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, 4)
+    .map(([name]) => name);
+
+  const summary = profile?.summary || profile?.bio || 'I build reliable products with a strong backend core and crisp frontend execution.';
+  const yearsOfExperience = Math.max(profile?.years_of_experience || 1, 1);
+  const stats = useMemo(() => ([
+    {
+      key: 'years',
+      count: yearsOfExperience,
+      duration: 1400,
+      suffix: '+',
+      label: 'Years',
+      detail: 'Shipping production work',
+    },
+    {
+      key: 'stack',
+      count: techCount,
+      duration: 1700,
+      suffix: '+',
+      label: 'Tools',
+      detail: 'Across frontend and backend',
+    },
+    {
+      key: 'domains',
+      count: domainCount,
+      duration: 1200,
+      suffix: '',
+      label: 'Domains',
+      detail: 'Core areas of depth',
+    },
+  ]), [domainCount, techCount, yearsOfExperience]);
+
+  const yearsCounter = useCountUp(stats[0].count, stats[0].duration, prefersReducedMotion);
+  const toolsCounter = useCountUp(stats[1].count, stats[1].duration, prefersReducedMotion);
+  const domainsCounter = useCountUp(stats[2].count, stats[2].duration, prefersReducedMotion);
+  const counterRefs = [yearsCounter, toolsCounter, domainsCounter];
 
   if (isLoading) {
     return (
-      <section id={SectionId.Profile} className="profile-section">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="animate-pulse">
-            <div className="h-12 bg-neutral-200 dark:bg-neutral-800 rounded w-48 mb-6"></div>
-            <div className="h-1 w-12 bg-neutral-200 dark:bg-neutral-800 mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded w-full"></div>
-              <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded w-5/6"></div>
-              <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded w-4/6"></div>
+      <section id={SectionId.Profile} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+        <div className="section-frame">
+          <div className="section-frame-inner animate-pulse">
+            <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-12">
+              <div className="md:col-span-4">
+                <div className="h-12 w-44 bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-4 h-px w-12 bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-4 h-4 w-28 bg-neutral-200 dark:bg-neutral-800" />
+              </div>
+              <div className="md:col-span-8">
+                <div className="ml-auto h-16 max-w-xl bg-neutral-200 dark:bg-neutral-800" />
+              </div>
             </div>
+
+            <div className="h-px bg-neutral-200 dark:bg-neutral-800" />
+
+            <div className="grid gap-0 lg:grid-cols-12">
+              <div className="h-72 border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 lg:col-span-7 lg:border-b-0 lg:border-r" />
+              <div className="grid gap-px bg-neutral-200 dark:bg-neutral-800 sm:grid-cols-2 lg:col-span-5">
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="h-36 bg-neutral-100 dark:bg-neutral-900" />
+                ))}
+              </div>
+            </div>
+
+            <div className="h-px bg-neutral-200 dark:bg-neutral-800" />
           </div>
         </div>
       </section>
@@ -115,144 +191,135 @@ export const Profile: React.FC = () => {
 
   if (error || !profile) {
     return (
-      <section id={SectionId.Profile} className="profile-section">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <p className="text-red-500">Error loading profile data. Please try again later.</p>
+      <section id={SectionId.Profile} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+        <div className="section-frame">
+          <div className="section-frame-inner">
+            <p className="text-red-500">Error loading profile data. Please try again later.</p>
+          </div>
         </div>
       </section>
     );
   }
 
-  const availabilityColor = profile.availability_status === 'available' ? 'bg-green-500' : 
-                           profile.availability_status === 'busy' ? 'bg-yellow-500' : 'bg-red-500';
-  const availabilityText = profile.availability_status === 'available' ? 'Open to Work' : 
-                          profile.availability_status === 'busy' ? 'Busy' : 'Not Available';
-
-  const stats = [
-    {
-      key: 'experience',
-      count: yearsCount,
-      ref: yearsRef,
-      suffix: '+',
-      label: 'Years of Experience',
-      sublabel: 'Building real-world applications',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-      ),
-    },
-    {
-      key: 'skills',
-      count: skillsCount,
-      ref: skillsRef,
-      suffix: '+',
-      label: 'Technologies',
-      sublabel: 'In the current arsenal',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="16 18 22 12 16 6"></polyline>
-          <polyline points="8 6 2 12 8 18"></polyline>
-        </svg>
-      ),
-    },
-    {
-      key: 'categories',
-      count: categoriesCount,
-      ref: categoriesRef,
-      suffix: '',
-      label: 'Skill Domains',
-      sublabel: 'From frontend to DevOps',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="2" y1="12" x2="22" y2="12"></line>
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-        </svg>
-      ),
-    },
-    {
-      key: 'availability',
-      count: null,
-      ref: null,
-      suffix: '',
-      label: 'Current Status',
-      sublabel: profile.location || 'Remote',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-      ),
-    },
-  ];
-
   return (
-    <section id={SectionId.Profile} className="profile-section">
-      {/* Decorative accent line */}
-      <div className="profile-accent-line"></div>
-
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Top Row: Heading + Tagline */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-16">
-          <div className="md:col-span-4">
-            <div className="profile-heading-wrapper">
-              <h2 className="font-display text-4xl md:text-5xl font-medium tracking-tight text-black dark:text-white">
+    <section
+      id={SectionId.Profile}
+      className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
+    >
+      <div className="section-frame">
+        <div className="section-frame-inner">
+          <div className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8">
+            <div className="md:col-span-4">
+              <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
                 PROFILE<span className="text-neutral-300 dark:text-neutral-700">.</span>
               </h2>
-              <div className="w-12 h-1 bg-black dark:bg-white mt-6 mb-4"></div>
-              <p className="font-mono text-xs uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
-                Who I am & what I do
+              <div className="mt-4 h-px w-12 bg-black dark:bg-white" />
+              <p className="mt-4 text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
+                Core Snapshot
+              </p>
+            </div>
+            <div className="md:col-span-8 md:flex md:items-end md:justify-end">
+              <p className="text-lg leading-relaxed text-neutral-500 dark:text-neutral-400 md:max-w-xl md:text-right">
+                Full-stack execution with a backend-first mindset, resilient systems thinking, and interfaces that feel considered instead of overdesigned.
               </p>
             </div>
           </div>
 
-          {/* Summary with keyword highlights */}
-          <div className="md:col-span-8">
-            <div className="profile-summary-card">
-              <div className="profile-quote-mark">"</div>
-              <p className="profile-summary-text">
-                {highlightKeywords(profile.summary || profile.bio || '')}
-              </p>
-            </div>
-          </div>
-        </div>
+          <div className="h-px bg-black dark:bg-white" />
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {stats.map((stat) => (
-            <div
-              key={stat.key}
-              ref={stat.ref}
-              className={`profile-stat-card ${hoveredStat === stat.key ? 'profile-stat-card-active' : ''}`}
-              onMouseEnter={() => setHoveredStat(stat.key)}
-              onMouseLeave={() => setHoveredStat(null)}
-            >
-              <div className="profile-stat-icon">
-                {stat.icon}
-              </div>
-              <div className="profile-stat-value">
-                {stat.key === 'availability' ? (
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${availabilityColor} opacity-75`}></span>
-                      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${availabilityColor}`}></span>
+          <div className="grid grid-cols-1 lg:grid-cols-12">
+            <div className="border-b border-neutral-200 dark:border-neutral-800 lg:col-span-7 lg:border-b-0 lg:border-r">
+              <div className="p-6 md:p-8 lg:p-10">
+                <div className="mb-8 flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 border border-neutral-200 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+                    <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${availabilityTone}`}>
+                      <span className={`absolute inset-0 rounded-full ${availabilityTone} animate-ping opacity-60 motion-reduce:hidden`} />
                     </span>
-                    <span className="text-lg md:text-xl font-medium">{availabilityText}</span>
-                  </div>
-                ) : (
-                  <span className="profile-stat-number">
-                    {stat.count}{stat.suffix}
+                    {availabilityText}
                   </span>
-                )}
+                  <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-600">
+                    {profile.location || 'Remote'}
+                  </span>
+                </div>
+
+                <p className="max-w-3xl font-display text-[1.1rem] leading-[1.5] tracking-tight text-black dark:text-white sm:text-[1.25rem] md:text-[1.5rem] md:leading-[1.35]">
+                  {highlightKeywords(summary)}
+                </p>
+
+                <div className="mt-8 grid gap-6 border-t border-neutral-200 pt-6 dark:border-neutral-800 md:grid-cols-[minmax(0,1.35fr)_minmax(240px,0.65fr)]">
+                  <div>
+                    <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
+                      Current Focus
+                    </p>
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                      Backend systems, APIs, scalable data flows, and frontend layers that communicate structure clearly.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-px border border-neutral-200 bg-neutral-200 dark:border-neutral-800 dark:bg-neutral-800">
+                    {spotlightDomains.map((domain) => (
+                      <div
+                        key={domain}
+                        className="bg-white px-3 py-3 text-[11px] font-mono uppercase tracking-[0.18em] text-neutral-600 dark:bg-black dark:text-neutral-400"
+                      >
+                        {domain}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="profile-stat-label">{stat.label}</div>
-              <div className="profile-stat-sublabel">{stat.sublabel}</div>
             </div>
-          ))}
+
+            <div className="lg:col-span-5">
+              <div className="space-y-px bg-neutral-200 dark:bg-neutral-800">
+                <div className="grid grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800">
+                  {stats.map((stat, index) => {
+                    const counter = counterRefs[index];
+
+                    return (
+                      <div
+                        key={stat.key}
+                        ref={counter.ref}
+                        className="bg-white px-3 py-4 transition-colors duration-300 dark:bg-black md:px-5 md:py-6"
+                      >
+                        <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-neutral-400 dark:text-neutral-600 md:text-[11px] md:tracking-[0.22em]">
+                          {stat.label}
+                        </p>
+                        <p className="mt-3 font-display text-[2rem] leading-none tracking-tight text-black dark:text-white md:mt-5 md:text-5xl">
+                          {counter.count}
+                          {stat.suffix}
+                        </p>
+                        <p className="mt-2 text-[12px] leading-snug text-neutral-500 dark:text-neutral-400 md:mt-3 md:max-w-[15rem] md:text-sm md:leading-relaxed">
+                          {stat.detail}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="bg-white px-5 py-6 dark:bg-black">
+                  <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
+                    Reach
+                  </p>
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="mt-5 inline-flex items-center gap-2 font-display text-2xl leading-tight tracking-tight text-black transition-opacity hover:opacity-70 dark:text-white"
+                  >
+                    {profile.email}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="7" y1="17" x2="17" y2="7" />
+                      <polyline points="7 7 17 7 17 17" />
+                    </svg>
+                  </a>
+                  <p className="mt-3 max-w-[20rem] text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+                    Available for full-stack builds, backend-heavy systems, and product-focused collaboration.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-black dark:bg-white" />
         </div>
       </div>
     </section>

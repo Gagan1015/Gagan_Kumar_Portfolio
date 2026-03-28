@@ -1,313 +1,441 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { SectionId } from '../types';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useExperiences } from '../hooks/usePortfolio';
+import { Experience as ExperienceItem, SectionId } from '../types';
+import { optimizeCloudinaryUrl } from '../utils/cloudinary';
 
-/* ─── Format employment type ─── */
-const formatEmploymentType = (type: string): string => {
-  const map: Record<string, string> = {
+const formatEmploymentType = (type: ExperienceItem['employment_type']): string => {
+  const map: Record<ExperienceItem['employment_type'], string> = {
     full_time: 'Full-time',
     part_time: 'Part-time',
     contract: 'Contract',
     freelance: 'Freelance',
   };
+
   return map[type] || type;
 };
 
-/* ─── Format date range ─── */
 const formatDateRange = (start: string, end: string | null, isCurrent: boolean): string => {
   const startDate = new Date(start);
-  const startStr = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  if (isCurrent) return `${startStr} — Present`;
-  if (!end) return startStr;
+  const startString = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  if (isCurrent) return `${startString} - Present`;
+  if (!end) return startString;
+
   const endDate = new Date(end);
-  const endStr = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  return `${startStr} — ${endStr}`;
+  const endString = endDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  return `${startString} - ${endString}`;
 };
 
-/* ─── Calculate duration string ─── */
-const calcDuration = (start: string, end: string | null, isCurrent: boolean): string => {
-  const s = new Date(start);
-  const e = isCurrent || !end ? new Date() : new Date(end);
-  const totalMonths = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
-  const years = Math.floor(totalMonths / 12);
-  const months = totalMonths % 12;
-  if (years === 0) return `${months} mo`;
-  if (months === 0) return `${years} yr`;
-  return `${years} yr ${months} mo`;
+const getCompanyInitials = (company: string): string => {
+  const words = company.split(/\s+/).filter(Boolean);
+  return words.slice(0, 2).map((word) => word[0]?.toUpperCase() || '').join('') || 'EX';
 };
 
-/* ═══════════════════════════════════════════
-   EXPERIENCE CARD — Accordion-style expandable
-   ═══════════════════════════════════════════ */
+const getLogoSource = (logo: string | null): string | null => {
+  if (!logo) return null;
+  return optimizeCloudinaryUrl(logo, 160);
+};
+
 interface ExperienceCardProps {
-  job: {
-    id: number;
-    company: string;
-    position: string;
-    location: string | null;
-    employment_type: string;
-    start_date: string;
-    end_date: string | null;
-    is_current: boolean;
-    description: string | null;
-    responsibilities: string[] | null;
-    technologies: string[] | null;
-    company_logo: string | null;
-    website_url: string | null;
-  };
+  desktopHoverEnabled: boolean;
+  experience: ExperienceItem;
   index: number;
   isExpanded: boolean;
+  onActivate: () => void;
+  onDeactivate: () => void;
   onToggle: () => void;
-  isVisible: boolean;
+  prefersReducedMotion: boolean;
 }
 
 const ExperienceCard: React.FC<ExperienceCardProps> = ({
-  job,
+  desktopHoverEnabled,
+  experience,
   index,
   isExpanded,
+  onActivate,
+  onDeactivate,
   onToggle,
-  isVisible,
+  prefersReducedMotion,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
+  const logoSrc = getLogoSource(experience.company_logo);
+  const displayRange = formatDateRange(experience.start_date, experience.end_date, experience.is_current);
 
   useEffect(() => {
-    if (contentRef.current) {
-      setContentHeight(contentRef.current.scrollHeight);
+    if (!contentRef.current) return;
+    setContentHeight(contentRef.current.scrollHeight);
+  }, [experience, isExpanded]);
+
+  const handleMouseEnter = () => {
+    if (desktopHoverEnabled) {
+      onActivate();
     }
-  }, [isExpanded, job]);
+  };
+
+  const handleMouseLeave = () => {
+    if (desktopHoverEnabled) {
+      onDeactivate();
+    }
+  };
+
+  const handleButtonClick = () => {
+    onToggle();
+  };
 
   return (
-    <div
-      className={`exp-card transition-all duration-700 ease-out ${
-        isVisible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-12'
-      }`}
-      style={{ transitionDelay: `${150 + index * 100}ms` }}
+    <article
+      className="group relative border-b border-neutral-200 dark:border-neutral-800 last:border-b-0"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* ─── Clickable header ─── */}
-      <button
-        onClick={onToggle}
-        className="exp-card-header group"
-        aria-expanded={isExpanded}
-      >
-        {/* Left: Timeline node + number */}
-        <div className="exp-timeline-col">
-          <div className={`exp-node ${isExpanded ? 'exp-node--active' : ''} ${job.is_current ? 'exp-node--current' : ''}`}>
-            {job.is_current && (
-              <span className="absolute inset-0 rounded-full animate-ping bg-green-500/30" />
-            )}
-          </div>
-          <span className="exp-index">{String(index + 1).padStart(2, '0')}</span>
+      <div className="relative grid gap-4 py-5 md:grid-cols-[2.75rem_minmax(0,1fr)] md:gap-6 md:py-7">
+        <div className="relative hidden md:flex justify-center">
+          <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-neutral-200 dark:bg-neutral-800" />
+          <div
+            className={`absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-sky-500 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+              isExpanded ? 'origin-top scale-y-100' : 'origin-top scale-y-0'
+            }`}
+          />
+          <span
+            className={`relative mt-3 h-3 w-3 rounded-full border transition-all duration-500 ${
+              isExpanded
+                ? 'border-sky-500 bg-[#0f172a] shadow-[0_0_0_4px_rgba(59,130,246,0.12)] dark:bg-sky-950'
+                : 'border-neutral-500 bg-black dark:border-neutral-500 dark:bg-white'
+            }`}
+          />
         </div>
 
-        {/* Center: Role & company */}
-        <div className="exp-header-main">
-          <div className="exp-header-top-row">
-            <h3 className="exp-role">{job.position}</h3>
-            {job.is_current && (
-              <span className="exp-current-badge">Current</span>
-            )}
-          </div>
-          <div className="exp-header-meta">
-            <span className="exp-company">
-              {job.website_url ? (
-                <a
-                  href={job.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="exp-company-link"
+        <div>
+          <button
+            type="button"
+            onClick={handleButtonClick}
+            onFocus={onActivate}
+            className="block w-full text-left"
+            aria-expanded={isExpanded}
+          >
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-6">
+              <div className="flex min-w-0 items-start gap-3 md:gap-4">
+                <div
+                  className={`flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border text-xs font-mono uppercase tracking-[0.18em] transition-all duration-500 md:h-14 md:w-14 md:text-sm ${
+                    isExpanded
+                      ? 'border-neutral-700 bg-neutral-950 text-sky-400 shadow-[0_10px_30px_rgba(0,0,0,0.18)] dark:border-neutral-700 dark:bg-neutral-950'
+                      : 'border-neutral-200 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-400'
+                  }`}
                 >
-                  {job.company}
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="inline-block ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+                  {logoSrc ? (
+                    <img
+                      src={logoSrc}
+                      alt={`${experience.company} logo`}
+                      className="h-full w-full object-contain p-2"
+                      width={56}
+                      height={56}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span>{getCompanyInitials(experience.company)}</span>
+                  )}
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 font-mono text-[11px] uppercase tracking-[0.22em] text-neutral-300 dark:text-neutral-700 md:hidden">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div className="min-w-0">
+                      <h3
+                        className={`truncate font-display text-[1.2rem] leading-tight tracking-tight transition-colors duration-400 sm:text-[1.35rem] md:text-[2rem] ${
+                          isExpanded
+                            ? 'text-sky-600 dark:text-sky-400'
+                            : 'text-black dark:text-white'
+                        }`}
+                      >
+                        {experience.company}
+                      </h3>
+
+                      <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[13px] leading-relaxed text-neutral-500 dark:text-neutral-400 md:mt-2 md:gap-x-3 md:gap-y-2 md:text-sm">
+                        <span className="inline-flex items-center gap-2">
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <rect x="3" y="7" width="18" height="13" rx="2" />
+                            <path d="M16 20V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v15" />
+                          </svg>
+                          <span className="font-medium text-black dark:text-white">{experience.position}</span>
+                        </span>
+
+                        <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                        <span className="font-mono text-[11px] uppercase tracking-[0.2em]">
+                          {formatEmploymentType(experience.employment_type)}
+                        </span>
+
+                        {experience.location && (
+                          <>
+                            <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+                            <span>{experience.location}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start justify-start md:justify-end">
+                <div
+                  className={`inline-flex items-center gap-2 rounded-md border px-3.5 py-2 text-[13px] transition-all duration-500 md:px-4 md:text-sm ${
+                    isExpanded
+                      ? 'border-neutral-700 bg-neutral-950 text-neutral-200 dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-200'
+                      : 'border-neutral-200 bg-neutral-50 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400'
+                  }`}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                </a>
-              ) : (
-                job.company
-              )}
-            </span>
-            <span className="exp-meta-dot" />
-            <span className="exp-meta-text">{formatEmploymentType(job.employment_type)}</span>
-            {job.location && (
-              <>
-                <span className="exp-meta-dot" />
-                <span className="exp-meta-text">{job.location}</span>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right: Date + expand icon */}
-        <div className="exp-header-right">
-          <div className="exp-date-col">
-            <span className="exp-date">{formatDateRange(job.start_date, job.end_date, job.is_current)}</span>
-            <span className="exp-duration">{calcDuration(job.start_date, job.end_date, job.is_current)}</span>
-          </div>
-          <div className={`exp-expand-icon ${isExpanded ? 'exp-expand-icon--open' : ''}`}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" className={`exp-expand-vline ${isExpanded ? 'exp-expand-vline--hidden' : ''}`} />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </div>
-        </div>
-      </button>
-
-      {/* ─── Expandable content ─── */}
-      <div
-        className="exp-content-wrapper"
-        style={{ maxHeight: isExpanded ? `${contentHeight}px` : '0px' }}
-      >
-        <div ref={contentRef} className="exp-content">
-          {/* Description */}
-          {job.description && (
-            <p className="exp-description">{job.description}</p>
-          )}
-
-          {/* Responsibilities */}
-          {job.responsibilities && job.responsibilities.length > 0 && (
-            <div className="exp-responsibilities">
-              <h4 className="exp-sub-label">Key Responsibilities</h4>
-              <ul className="exp-resp-list">
-                {job.responsibilities.map((item, i) => (
-                  <li key={i} className="exp-resp-item">
-                    <span className="exp-resp-arrow">&#8250;</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Technologies */}
-          {job.technologies && job.technologies.length > 0 && (
-            <div className="exp-tech-section">
-              <h4 className="exp-sub-label">Stack</h4>
-              <div className="exp-tech-list">
-                {job.technologies.map((tech) => (
-                  <span key={tech} className="exp-tech-tag">
-                    {tech}
-                  </span>
-                ))}
+                  <span className="font-medium">{displayRange}</span>
+                </div>
               </div>
             </div>
-          )}
+          </button>
+
+          <div
+            className="overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+            style={{
+              maxHeight: isExpanded ? `${contentHeight}px` : '0px',
+              opacity: isExpanded ? 1 : 0,
+            }}
+          >
+            <div
+              ref={contentRef}
+              className={`pt-4 md:pl-[4.2rem] ${
+                prefersReducedMotion ? '' : 'transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]'
+              } ${isExpanded ? 'translate-y-0' : 'translate-y-2'}`}
+            >
+              {experience.description && (
+                <p className="max-w-4xl text-[0.95rem] leading-relaxed text-neutral-700 dark:text-neutral-300 md:text-[1.05rem]">
+                  {experience.description}
+                </p>
+              )}
+
+              {experience.responsibilities && experience.responsibilities.length > 0 && (
+                <div className="mt-5 border-l border-sky-500/40 pl-4 md:pl-6">
+                  <ul className="space-y-3">
+                    {experience.responsibilities.map((responsibility) => (
+                      <li key={responsibility} className="flex items-start gap-3 text-[0.95rem] leading-relaxed text-neutral-500 dark:text-neutral-400 md:text-base">
+                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-sky-500" />
+                        <span>{responsibility}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {(experience.technologies?.length || experience.website_url) && (
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {experience.technologies?.map((technology) => (
+                    <span
+                      key={technology}
+                      className="rounded-md border border-neutral-200 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.16em] text-neutral-500 dark:border-neutral-800 dark:text-neutral-400"
+                    >
+                      {technology}
+                    </span>
+                  ))}
+
+                  {experience.website_url && (
+                    <a
+                      href={experience.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                      className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-black transition-opacity hover:opacity-70 dark:text-white"
+                    >
+                      Visit site
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7" />
+                        <polyline points="7 7 17 7 17 17" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
-/* ═══════════════════════════════════════════
-   EXPERIENCE SECTION
-   ═══════════════════════════════════════════ */
 export const Experience: React.FC = () => {
   const { data: experiences, isLoading, error } = useExperiences();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [desktopHoverEnabled, setDesktopHoverEnabled] = useState(false);
 
-  /* Intersection Observer for entrance animation */
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.08 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1024px)');
+    const syncDesktopHover = () => setDesktopHoverEnabled(mediaQuery.matches);
+
+    syncDesktopHover();
+    mediaQuery.addEventListener('change', syncDesktopHover);
+
+    return () => mediaQuery.removeEventListener('change', syncDesktopHover);
   }, []);
 
-  const handleToggle = useCallback(
-    (id: number) => {
-      setExpandedId((prev) => (prev === id ? null : id));
-    },
-    []
+  const handleActivate = useCallback((id: number) => {
+    setExpandedId(id);
+  }, []);
+
+  const handleDeactivate = useCallback((id: number) => {
+    setExpandedId((previous) => (previous === id ? null : previous));
+  }, []);
+
+  const handleToggle = useCallback((id: number) => {
+    setExpandedId((previous) => (previous === id ? null : id));
+  }, []);
+
+  const currentRoles = useMemo(
+    () => experiences?.filter((experience) => experience.is_current).length ?? 0,
+    [experiences]
   );
 
-  /* ─── Section wrapper classes ─── */
-  const sectionClasses =
-    'bg-white dark:bg-geo-dark-bg py-24 md:py-32 px-6 md:px-12 border-b border-neutral-200 dark:border-geo-dark-border transition-colors duration-300';
-
-  return (
-    <section id={SectionId.Experience} ref={sectionRef} className={sectionClasses}>
-      <div className="max-w-7xl mx-auto">
-        {/* ─── Loading state ─── */}
-        {isLoading && (
-          <>
-            <div className="mb-16">
-              <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
-                EXPERIENCE<span className="text-neutral-300 dark:text-neutral-700">.</span>
-              </h2>
-            </div>
-            <div className="space-y-6 animate-pulse">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="exp-skeleton">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-3 h-3 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                    <div className="h-6 w-48 bg-neutral-200 dark:bg-neutral-800 rounded" />
-                  </div>
-                  <div className="h-4 w-72 bg-neutral-100 dark:bg-neutral-800/60 rounded ml-7" />
-                  <div className="h-4 w-32 bg-neutral-100 dark:bg-neutral-800/60 rounded ml-7 mt-2" />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* ─── Error state ─── */}
-        {!isLoading && (error || !experiences) && (
-          <p className="text-red-500">Error loading experience data. Please try again later.</p>
-        )}
-
-        {/* ─── Data loaded ─── */}
-        {!isLoading && experiences && experiences.length > 0 && (
-          <>
-            {/* Section header */}
-            <div
-              className={`mb-20 transition-all duration-700 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                <div>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-400 dark:text-neutral-600 block mb-3">
-                    Career Path
-                  </span>
-                  <h2 className="font-display text-4xl md:text-5xl font-medium tracking-tight text-black dark:text-white">
-                    EXPERIENCE<span className="text-neutral-300 dark:text-neutral-700">.</span>
-                  </h2>
-                  <div className="w-12 h-1 bg-black dark:bg-white mt-6" />
-                </div>
-                <p className="text-sm text-neutral-500 dark:text-neutral-500 max-w-xs font-mono leading-relaxed">
-                  {experiences.length} role{experiences.length !== 1 ? 's' : ''} &mdash; click to expand details
-                </p>
+  if (isLoading) {
+    return (
+      <section id={SectionId.Experience} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+        <div className="section-frame">
+          <div className="section-frame-inner animate-pulse">
+            <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-12">
+              <div className="md:col-span-4">
+                <div className="h-12 w-56 bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-4 h-px w-12 bg-neutral-200 dark:bg-neutral-800" />
+                <div className="mt-4 h-4 w-32 bg-neutral-200 dark:bg-neutral-800" />
+              </div>
+              <div className="md:col-span-8">
+                <div className="ml-auto h-16 max-w-xl bg-neutral-200 dark:bg-neutral-800" />
               </div>
             </div>
 
-            {/* Timeline thread + cards */}
-            <div className="exp-timeline">
-              {experiences.map((job, index) => (
-                <ExperienceCard
-                  key={job.id}
-                  job={job}
-                  index={index}
-                  isExpanded={expandedId === job.id}
-                  onToggle={() => handleToggle(job.id)}
-                  isVisible={isVisible}
-                />
+            <div className="h-px bg-neutral-200 dark:bg-neutral-800" />
+
+            <div className="mt-6 space-y-0">
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="h-28 border-b border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black" />
               ))}
             </div>
-          </>
-        )}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !experiences) {
+    return (
+      <section id={SectionId.Experience} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+        <div className="section-frame">
+          <div className="section-frame-inner">
+            <p className="text-red-500">Error loading experience data. Please try again later.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      id={SectionId.Experience}
+      className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
+    >
+      <div className="section-frame">
+        <div className="section-frame-inner">
+          <div className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8">
+            <div className="md:col-span-4">
+              <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
+                EXPERIENCE<span className="text-neutral-300 dark:text-neutral-700">.</span>
+              </h2>
+              <div className="mt-4 h-px w-12 bg-black dark:bg-white" />
+              <p className="mt-4 text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
+                Career Timeline
+              </p>
+            </div>
+            <div className="md:col-span-8 md:flex md:items-end md:justify-end">
+              <div className="md:max-w-xl md:text-right">
+                <p className="text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
+                  Roles across product delivery, implementation, and shipping, presented as a hover-first timeline that opens into the actual work behind each position.
+                </p>
+                <p className="mt-4 text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
+                  {desktopHoverEnabled ? 'Hover to expand on desktop' : 'Tap to expand on touch devices'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px bg-black dark:bg-white" />
+
+          <div className="hidden grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800 md:grid">
+            <div className="bg-white px-3 py-4 dark:bg-black md:px-5 md:py-5">
+              <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
+                Roles
+              </p>
+              <p className="mt-3 font-display text-[2rem] tracking-tight text-black dark:text-white md:text-3xl">{experiences.length}</p>
+            </div>
+            <div className="bg-white px-3 py-4 dark:bg-black md:px-5 md:py-5">
+              <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
+                Current
+              </p>
+              <p className="mt-3 font-display text-[2rem] tracking-tight text-black dark:text-white md:text-3xl">{currentRoles}</p>
+            </div>
+            <div className="bg-white px-3 py-4 dark:bg-black md:px-5 md:py-5">
+              <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
+                Format
+              </p>
+              <p className="mt-3 text-[12px] leading-snug text-neutral-500 dark:text-neutral-400 md:text-sm md:leading-relaxed">
+                Compact by default, expanded on hover with a smooth reveal and a tap fallback for smaller devices.
+              </p>
+            </div>
+          </div>
+
+          <div className="h-px bg-black dark:bg-white" />
+
+          <div className="relative">
+            {experiences.map((experience, index) => (
+              <ExperienceCard
+                key={experience.id}
+                desktopHoverEnabled={desktopHoverEnabled}
+                experience={experience}
+                index={index}
+                isExpanded={expandedId === experience.id}
+                onActivate={() => handleActivate(experience.id)}
+                onDeactivate={() => handleDeactivate(experience.id)}
+                onToggle={() => handleToggle(experience.id)}
+                prefersReducedMotion={prefersReducedMotion}
+              />
+            ))}
+          </div>
+
+          <div className="h-px bg-black dark:bg-white" />
+        </div>
       </div>
     </section>
   );

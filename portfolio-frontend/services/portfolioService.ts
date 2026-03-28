@@ -53,11 +53,6 @@ export const projectService = {
     return response.data.data;
   },
 
-  getById: async (id: string): Promise<Project> => {
-    const response = await apiClient.get(`${API_ENDPOINTS.projects}/${id}`);
-    return response.data.data;
-  },
-
   getFeatured: async (): Promise<Project[]> => {
     const response = await apiClient.get(API_ENDPOINTS.projects, {
       params: { featured: true },

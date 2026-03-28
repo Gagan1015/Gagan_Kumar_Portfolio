@@ -376,7 +376,8 @@ export const Skills: React.FC = () => {
   const renderContent = useCallback(() => {
     if (isLoading) {
       return (
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="section-frame">
+          <div className="section-frame-inner">
           <div className="skills-header-block">
             <h2 className="font-display text-4xl font-medium tracking-tight mb-6 text-black dark:text-white">
               TECHNICAL SKILLS<span className="text-neutral-300 dark:text-neutral-700">.</span>
@@ -387,20 +388,24 @@ export const Skills: React.FC = () => {
               <div key={i} className={`h-20 bg-neutral-100 dark:bg-neutral-900 rounded-xl ${i <= 2 ? 'bento-span-lg' : 'bento-span-sm'}`} />
             ))}
           </div>
+          </div>
         </div>
       );
     }
 
     if (error || !skillsGrouped) {
       return (
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="section-frame">
+          <div className="section-frame-inner">
           <p className="text-red-500">Error loading skills. Please try again later.</p>
+          </div>
         </div>
       );
     }
 
     return (
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="section-frame">
+        <div className="section-frame-inner">
         {/* Section Header */}
         <div className={`skills-header-block ${headerVisible ? 'skills-header-visible' : ''}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16 md:mb-20">
@@ -433,6 +438,7 @@ export const Skills: React.FC = () => {
               category={item.category}
             />
           ))}
+        </div>
         </div>
       </div>
     );
