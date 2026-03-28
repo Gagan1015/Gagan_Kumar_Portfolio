@@ -155,6 +155,20 @@ export const Hero: React.FC = () => {
       id={SectionId.Hero}
       className="hero-section relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-300"
     >
+      {/* Noise grain texture overlay */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          opacity: 0.15,
+          pointerEvents: 'none',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+        }}
+      />
+
       {/* Main content — two column on desktop */}
       <div className="section-frame w-full">
         <div className="section-frame-inner w-full py-16 md:py-24 relative z-10">
@@ -183,12 +197,13 @@ export const Hero: React.FC = () => {
               </div>
             </div>
 
-            {/* Phase 1: Availability badge */}
+            {/* Phase 1: Availability status */}
             <div className={`hero-phase hero-phase-badge ${phase >= 1 ? 'hero-phase-visible' : ''}`}>
               {!isLoading && profile?.availability_status === 'available' && (
-                <span className="hero-availability-badge">
-                  <span className="hero-availability-dot" />
-                  Available for new projects
+                <span className="hero-status-line">
+                  <span className="hero-status-slash">//</span>
+                  <span className="hero-status-text">open to collaborate</span>
+                  <span className="hero-status-cursor">_</span>
                 </span>
               )}
             </div>

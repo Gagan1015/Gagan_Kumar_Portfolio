@@ -702,6 +702,9 @@ body {
    ============================================ */
 
 /* ─── Phase entrance system ─── */
+
+
+
 .hero-phase {
     opacity: 0;
     transform: translateY(20px);
@@ -828,21 +831,39 @@ body {
 }
 
 /* ─── Availability badge ─── */
-.hero-availability-badge {
+/* ─── Code-comment status line ─── */
+.hero-status-line {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 14px 5px 10px;
-    font-family: var(--font-sans);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #16a34a;
-    background: rgba(22, 163, 74, 0.08);
-    border: 1px solid rgba(22, 163, 74, 0.2);
-    border-radius: 999px;
+    gap: 4px;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: #737373;
 }
+:is(.dark) .hero-status-line {
+    color: #525252;
+}
+.hero-status-slash {
+    color: #16a34a;
+    font-weight: 600;
+}
+.hero-status-text {
+    color: #16a34a;
+}
+:is(.dark) .hero-status-text {
+    color: #16a34a;
+}
+.hero-status-cursor {
+    color: #16a34a;
+    animation: hero-cursor-blink 1s step-end infinite;
+}
+@keyframes hero-cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
 .hero-availability-dot {
     width: 6px;
     height: 6px;
