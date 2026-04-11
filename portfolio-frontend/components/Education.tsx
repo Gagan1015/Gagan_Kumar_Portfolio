@@ -56,7 +56,7 @@ export const Education: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section id={SectionId.Education} className="bg-neutral-50 py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
+      <section id={SectionId.Education} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
         <div className="section-frame">
           <div className="section-frame-inner">
           <h2 className="font-display text-4xl font-medium tracking-tight mb-6 text-black dark:text-white">
@@ -75,7 +75,7 @@ export const Education: React.FC = () => {
 
   if (error || !education) {
     return (
-      <section id={SectionId.Education} className="bg-neutral-50 py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
+      <section id={SectionId.Education} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
         <div className="section-frame">
           <div className="section-frame-inner">
           <p className="text-neutral-500">Error loading education data. Please try again later.</p>
@@ -86,7 +86,7 @@ export const Education: React.FC = () => {
   }
 
   return (
-    <section id={SectionId.Education} className="bg-neutral-50 py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
+    <section id={SectionId.Education} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-card md:py-32">
       <div className="section-frame">
         <div className="section-frame-inner">
         {/* Section Header */}

@@ -323,7 +323,7 @@ export const Experience: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section id={SectionId.Experience} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+      <section id={SectionId.Experience} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
         <div className="section-frame">
           <div className="section-frame-inner animate-pulse">
             <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-12">
@@ -352,7 +352,7 @@ export const Experience: React.FC = () => {
 
   if (error || !experiences) {
     return (
-      <section id={SectionId.Experience} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+      <section id={SectionId.Experience} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
         <div className="section-frame">
           <div className="section-frame-inner">
             <p className="text-red-500">Error loading experience data. Please try again later.</p>
@@ -365,7 +365,7 @@ export const Experience: React.FC = () => {
   return (
     <section
       id={SectionId.Experience}
-      className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
+      className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
     >
       <div className="section-frame">
         <div className="section-frame-inner">
@@ -394,19 +394,19 @@ export const Experience: React.FC = () => {
           <div className="h-px bg-black dark:bg-white" />
 
           <div className="hidden grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800 md:grid">
-            <div className="bg-white px-3 py-4 dark:bg-black md:px-5 md:py-5">
+            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                 Roles
               </p>
               <p className="mt-3 font-display text-[2rem] tracking-tight text-black dark:text-white md:text-3xl">{experiences.length}</p>
             </div>
-            <div className="bg-white px-3 py-4 dark:bg-black md:px-5 md:py-5">
+            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                 Current
               </p>
               <p className="mt-3 font-display text-[2rem] tracking-tight text-black dark:text-white md:text-3xl">{currentRoles}</p>
             </div>
-            <div className="bg-white px-3 py-4 dark:bg-black md:px-5 md:py-5">
+            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                 Format
               </p>

@@ -65,9 +65,11 @@ export const BlogList: React.FC = () => {
   };
 
   return (
-    <div className="blog-page bg-white dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
+    <div className="blog-page bg-[#f4f4f4] dark:bg-geo-dark-bg min-h-screen transition-colors duration-300">
+      <div className="section-frame min-h-screen">
+        <div className="section-frame-inner h-full">
       {/* Back to Portfolio Link */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-6 md:pt-32">
+      <div className="pt-6 md:pt-32">
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 group"
@@ -81,7 +83,7 @@ export const BlogList: React.FC = () => {
       </div>
 
       {/* Section Header */}
-      <div className={`max-w-7xl mx-auto px-6 md:px-12 pt-12 pb-16 transition-all duration-700 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} ref={headerRef}>
+      <div className={`pt-12 pb-16 transition-all duration-700 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} ref={headerRef}>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-6">
             <h1 className="font-display text-4xl md:text-5xl font-medium tracking-tight text-black dark:text-white">
@@ -102,7 +104,7 @@ export const BlogList: React.FC = () => {
 
       {/* Category Filter Tabs */}
       {categories && categories.length > 0 && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-12">
+        <div className="pb-12">
           <div className="flex items-center gap-1 flex-wrap">
             <button
               onClick={() => setSelectedCategory(undefined)}
@@ -126,7 +128,7 @@ export const BlogList: React.FC = () => {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
+        <div className="pb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="animate-pulse">
@@ -145,7 +147,7 @@ export const BlogList: React.FC = () => {
 
       {/* Error State */}
       {error && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
+        <div className="pb-24">
           <div className="border border-neutral-200 dark:border-neutral-800 p-12 text-center">
             <p className="text-neutral-500 dark:text-neutral-400 font-mono text-sm">
               Error loading blog posts. Please try again later.
@@ -156,7 +158,7 @@ export const BlogList: React.FC = () => {
 
       {/* Blog Cards Grid */}
       {!isLoading && !error && (
-        <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24">
+        <div className="pb-24">
           {posts.length === 0 ? (
             <div className="border border-neutral-200 dark:border-neutral-800 p-12 text-center">
               <p className="text-neutral-500 dark:text-neutral-400 text-lg">
@@ -299,6 +301,8 @@ export const BlogList: React.FC = () => {
           )}
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 };

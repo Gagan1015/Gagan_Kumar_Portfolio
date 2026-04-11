@@ -59,20 +59,28 @@ const queryClient = new QueryClient({
   },
 });
 
-const SectionDivider: React.FC = () => {
-  return (
-    <div className="relative z-[1] hidden h-7 lg:block" aria-hidden="true">
-      <div className="absolute inset-0">
-        <div className="absolute inset-x-0 top-[4px] h-px bg-black/[0.10] dark:bg-white/[0.12]" />
-        <div className="absolute inset-x-0 bottom-[4px] h-px bg-black/[0.08] dark:bg-white/[0.10]" />
-        <div className="absolute inset-x-0 top-[5px] bottom-[5px] overflow-hidden">
-          <div className="absolute inset-0 bg-[repeating-linear-gradient(-45deg,rgba(17,17,17,0.065)_0px,rgba(17,17,17,0.065)_1px,transparent_1px,transparent_8px)] dark:bg-[repeating-linear-gradient(-45deg,rgba(255,255,255,0.055)_0px,rgba(255,255,255,0.055)_1px,transparent_1px,transparent_8px)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.62),rgba(255,255,255,0),rgba(255,255,255,0.62))] opacity-50 dark:bg-[linear-gradient(180deg,rgba(0,0,0,0.38),rgba(0,0,0,0),rgba(0,0,0,0.38))] dark:opacity-70" />
-        </div>
+const SectionDivider: React.FC = () => (
+  <div className="relative z-[2] h-px" aria-hidden="true">
+    {/* Mobile: single full-width line */}
+    <div className="absolute inset-x-0 top-0 h-px bg-black/[0.08] dark:bg-white/[0.10] lg:hidden" />
+    {/* Desktop: 3 line segments with gaps at cross positions */}
+    <div className="hidden lg:block absolute inset-x-0 top-0 mx-auto" style={{ maxWidth: '80rem' }}>
+      <div className="absolute top-0 h-px bg-black/[0.08] dark:bg-white/[0.10]" style={{ right: 'calc(100% + 16px)', left: '-100vw' }} />
+      <div className="absolute top-0 h-px bg-black/[0.08] dark:bg-white/[0.10]" style={{ left: '16px', right: '16px' }} />
+      <div className="absolute top-0 h-px bg-black/[0.08] dark:bg-white/[0.10]" style={{ left: 'calc(100% + 16px)', right: '-100vw' }} />
+      {/* Left cross: 1px-wide vertical mask + SVG */}
+      <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[3px] h-[30px] bg-[#f4f4f4] dark:bg-[#0a0a0a] transition-colors duration-300" />
+      <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M 12 5 L 12 19 M 5 12 L 19 12" stroke="rgba(20,20,20,0.15)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="dark:stroke-white/15" /></svg>
+      </div>
+      {/* Right cross: 1px-wide vertical mask + SVG */}
+      <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-[3px] h-[30px] bg-[#f4f4f4] dark:bg-[#0a0a0a] transition-colors duration-300" />
+      <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M 12 5 L 12 19 M 5 12 L 19 12" stroke="rgba(20,20,20,0.15)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="dark:stroke-white/15" /></svg>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 // Theme Provider Hook — with clip-path circle expand transition
 const useTheme = () => {
@@ -187,7 +195,7 @@ const PortfolioHome: React.FC<{ activeSection: string; setActiveSection: (s: str
   }, [setActiveSection]);
 
   return (
-    <div className="relative isolate min-h-screen bg-white selection:bg-black selection:text-white transition-colors duration-300 dark:bg-geo-dark-bg dark:selection:bg-white dark:selection:text-black">
+    <div className="relative isolate min-h-screen bg-[#f4f4f4] selection:bg-black selection:text-white transition-colors duration-300 dark:bg-geo-dark-bg dark:selection:bg-white dark:selection:text-black">
       <SEOHead 
         title={`${profile?.full_name || 'Gagan Kumar'} — Full-Stack Developer Portfolio`}
         description="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog."
@@ -225,7 +233,7 @@ const ContentLayout: React.FC<{ children: React.ReactNode; theme: Theme; onToggl
   children, theme, onToggleTheme, activeNav
 }) => {
   return (
-    <div className="relative isolate min-h-screen bg-white selection:bg-black selection:text-white transition-colors duration-300 dark:bg-geo-dark-bg dark:selection:bg-white dark:selection:text-black">
+    <div className="relative isolate min-h-screen bg-[#f4f4f4] selection:bg-black selection:text-white transition-colors duration-300 dark:bg-geo-dark-bg dark:selection:bg-white dark:selection:text-black">
       <Header activeSection={activeNav} theme={theme} onToggleTheme={onToggleTheme} />
       <div className="relative z-[1]">{children}</div>
       <SectionDivider />

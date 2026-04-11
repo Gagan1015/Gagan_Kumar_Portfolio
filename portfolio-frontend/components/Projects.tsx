@@ -60,7 +60,7 @@ export const Projects: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section id={SectionId.Projects} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+      <section id={SectionId.Projects} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
         <div className="mx-auto max-w-7xl">
           <h2 className="mb-16 font-display text-4xl font-medium tracking-tight text-black dark:text-white">
             SELECTED WORK<span className="text-neutral-300 dark:text-neutral-700">.</span>
@@ -77,7 +77,7 @@ export const Projects: React.FC = () => {
 
   if (error || !projects) {
     return (
-      <section id={SectionId.Projects} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+      <section id={SectionId.Projects} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
         <div className="mx-auto max-w-7xl">
           <p className="text-neutral-500">Error loading projects. Please try again later.</p>
         </div>
@@ -89,7 +89,7 @@ export const Projects: React.FC = () => {
     <section
       ref={sectionRef}
       id={SectionId.Projects}
-      className="relative overflow-hidden bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
+      className="relative overflow-hidden bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
       onMouseMove={handleMouseMove}
     >
       <div className="section-frame">

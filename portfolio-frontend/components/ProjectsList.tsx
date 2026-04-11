@@ -93,8 +93,10 @@ export const ProjectsList: React.FC = () => {
   let globalIndex = 0;
 
   return (
-    <div className="projects-page min-h-screen bg-white transition-colors duration-300 dark:bg-geo-dark-bg">
-      <div className="mx-auto max-w-[1400px] px-6 pt-6 md:px-12 md:pt-32">
+    <div className="projects-page min-h-screen bg-[#f4f4f4] transition-colors duration-300 dark:bg-geo-dark-bg">
+      <div className="section-frame min-h-screen">
+        <div className="section-frame-inner h-full">
+      <div className="pt-6 md:px-12 md:pt-32">
         <Link
           to="/"
           className="group inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 transition-colors duration-300 hover:text-black dark:hover:text-white"
@@ -107,7 +109,7 @@ export const ProjectsList: React.FC = () => {
         </Link>
       </div>
 
-      <div className={`mx-auto max-w-[1400px] px-6 pb-10 pt-12 transition-all duration-700 ease-out md:px-12 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
+      <div className={` pb-10 pt-12 transition-all duration-700 ease-out md:px-12 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
         <div className="grid grid-cols-1 items-end gap-8 md:grid-cols-12">
           <div className="md:col-span-7">
             <p className="mb-4 text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
@@ -127,7 +129,7 @@ export const ProjectsList: React.FC = () => {
       </div>
 
       {categories.length > 0 && (
-        <div className={`mx-auto max-w-[1400px] px-6 pb-10 transition-all duration-700 delay-200 ease-out md:px-12 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        <div className={` pb-10 transition-all duration-700 delay-200 ease-out md:px-12 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <div className="flex flex-wrap items-center gap-1">
             <button
               onClick={() => setSelectedCategory(undefined)}
@@ -150,7 +152,7 @@ export const ProjectsList: React.FC = () => {
       )}
 
       {isLoading && (
-        <div className="mx-auto max-w-[1400px] px-6 pb-24 md:px-12">
+        <div className="pb-24 md:px-12">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
             <div className="animate-pulse md:col-span-8">
               <div className="aspect-[16/9] border border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900" />
@@ -168,7 +170,7 @@ export const ProjectsList: React.FC = () => {
       )}
 
       {error && (
-        <div className="mx-auto max-w-[1400px] px-6 pb-24 md:px-12">
+        <div className="pb-24 md:px-12">
           <div className="border border-neutral-200 p-12 text-center dark:border-neutral-800">
             <p className="font-mono text-sm text-neutral-500 dark:text-neutral-400">
               Error loading projects. Please try again later.
@@ -178,7 +180,7 @@ export const ProjectsList: React.FC = () => {
       )}
 
       {!isLoading && !error && (
-        <div className="mx-auto max-w-[1400px] px-6 pb-24 md:px-12">
+        <div className="pb-24 md:px-12">
           {filteredProjects.length === 0 ? (
             <div className="border border-neutral-200 p-16 text-center dark:border-neutral-800">
               <p className="text-lg text-neutral-500 dark:text-neutral-400">
@@ -306,6 +308,9 @@ export const ProjectsList: React.FC = () => {
           )}
         </div>
       )}
+
+        </div>
+      </div>
 
       <ProjectQuickView
         closeButtonRef={closeButtonRef}

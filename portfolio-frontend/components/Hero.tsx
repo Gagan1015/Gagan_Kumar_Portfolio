@@ -153,7 +153,7 @@ export const Hero: React.FC = () => {
   return (
     <section
       id={SectionId.Hero}
-      className="hero-section relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-300"
+      className="hero-section relative min-h-screen flex items-center overflow-hidden bg-[#f4f4f4] dark:bg-[#0a0a0a] transition-colors duration-300"
     >
       {/* Noise grain texture overlay */}
       <div

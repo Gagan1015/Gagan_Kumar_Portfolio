@@ -103,13 +103,13 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
     <>
       {/* ===================== DESKTOP HEADER ===================== */}
       <header
-        className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 hidden md:block ${
-          isScrolled
-            ? 'bg-white/90 dark:bg-geo-dark-bg/90 backdrop-blur-md md:border-b md:border-neutral-200 dark:md:border-geo-dark-border py-3'
-            : 'bg-transparent md:border-b md:border-neutral-200/80 dark:md:border-geo-dark-border/80 py-6'
+        className={`fixed top-0 left-0 w-full z-40 transition-all hidden md:block ${
+          isScrolled ? 'py-4' : 'py-6'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
+        <div className={`mx-auto max-w-7xl flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] border border-transparent px-6 md:px-12 ${
+          isScrolled ? 'desktop-header-pill py-3' : 'py-3'
+        }`}>
           <div
             className="header-signature cursor-pointer select-none"
             onClick={() => {
@@ -123,13 +123,13 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
             {profile?.full_name || 'Loading...'}
           </div>
 
-          <div className="flex items-center gap-8">
-            <nav className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
+            <nav className="flex items-center gap-6">
               {navItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => goToRoute(item.route)}
-                  className={`text-sm font-medium uppercase tracking-wider transition-colors relative ${
+                  className={`text-sm font-medium tracking-wide transition-colors relative ${
                     location.pathname.startsWith(item.route)
                       ? 'text-black dark:text-white'
                       : 'text-neutral-400 hover:text-black dark:hover:text-white'
@@ -137,7 +137,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
                 >
                   {item.label}
                   {location.pathname.startsWith(item.route) && (
-                    <span className="absolute -bottom-1 left-0 w-full h-[1px] bg-black dark:bg-white"></span>
+                    <span className="absolute -bottom-1 left-0 w-full h-[1.5px] bg-black dark:bg-white rounded-full"></span>
                   )}
                 </button>
               ))}
@@ -146,9 +146,11 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
             {profile?.resume_url && (
               <button
                 onClick={() => resumeService.download()}
-                className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-mono text-xs tracking-widest uppercase hover:opacity-80 transition-opacity"
+                className={`flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black font-mono text-xs tracking-widest uppercase hover:opacity-80 transition-all duration-300 px-4 py-2 ${
+                  isScrolled ? 'rounded-lg' : 'rounded-none'
+                }`}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" className="transition-all duration-300">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
                   <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -159,7 +161,9 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
 
             <button
               onClick={(e) => onToggleTheme(e)}
-              className="w-8 h-8 flex items-center justify-center border border-neutral-200 dark:border-geo-dark-border rounded hover:bg-neutral-100 dark:hover:bg-geo-dark-card transition-colors text-black dark:text-white"
+              className={`flex items-center justify-center border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-geo-dark-card transition-all duration-300 text-black dark:text-white w-8 h-8 ${
+                isScrolled ? 'rounded-lg' : 'rounded'
+              }`}
               aria-label={`Current theme: ${theme}. Click to switch.`}
             >
               <ThemeIcon theme={theme} size={16} />

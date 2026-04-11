@@ -157,7 +157,7 @@ export const Profile: React.FC = () => {
 
   if (isLoading) {
     return (
-      <section id={SectionId.Profile} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+      <section id={SectionId.Profile} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
         <div className="section-frame">
           <div className="section-frame-inner animate-pulse">
             <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-12">
@@ -191,7 +191,7 @@ export const Profile: React.FC = () => {
 
   if (error || !profile) {
     return (
-      <section id={SectionId.Profile} className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
+      <section id={SectionId.Profile} className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32">
         <div className="section-frame">
           <div className="section-frame-inner">
             <p className="text-red-500">Error loading profile data. Please try again later.</p>
@@ -204,7 +204,7 @@ export const Profile: React.FC = () => {
   return (
     <section
       id={SectionId.Profile}
-      className="bg-white py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
+      className="bg-[#f4f4f4] py-16 transition-colors duration-300 dark:bg-geo-dark-bg md:py-32"
     >
       <div className="section-frame">
         <div className="section-frame-inner">
@@ -260,7 +260,7 @@ export const Profile: React.FC = () => {
                     {spotlightDomains.map((domain) => (
                       <div
                         key={domain}
-                        className="bg-white px-3 py-3 text-[11px] font-mono uppercase tracking-[0.18em] text-neutral-600 dark:bg-black dark:text-neutral-400"
+                        className="bg-[#f4f4f4] px-3 py-3 text-[11px] font-mono uppercase tracking-[0.18em] text-neutral-600 dark:bg-black dark:text-neutral-400"
                       >
                         {domain}
                       </div>
@@ -280,7 +280,7 @@ export const Profile: React.FC = () => {
                       <div
                         key={stat.key}
                         ref={counter.ref}
-                        className="bg-white px-3 py-4 transition-colors duration-300 dark:bg-black md:px-5 md:py-6"
+                        className="bg-[#f4f4f4] px-3 py-4 transition-colors duration-300 dark:bg-black md:px-5 md:py-6"
                       >
                         <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-neutral-400 dark:text-neutral-600 md:text-[11px] md:tracking-[0.22em]">
                           {stat.label}
@@ -297,7 +297,7 @@ export const Profile: React.FC = () => {
                   })}
                 </div>
 
-                <div className="bg-white px-5 py-6 dark:bg-black">
+                <div className="bg-[#f4f4f4] px-5 py-6 dark:bg-black">
                   <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                     Reach
                   </p>

@@ -184,7 +184,7 @@ export const Footer: React.FC = () => {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-neutral-50 dark:bg-[#050505] text-neutral-900 dark:text-white overflow-hidden transition-colors duration-300 pb-24 md:pb-0"
+      className="relative bg-[#f4f4f4] dark:bg-[#050505] text-neutral-900 dark:text-white overflow-hidden transition-colors duration-300 pb-24 md:pb-0"
     >
       {/* ─── Main content ─── */}
       <div className="section-frame">
