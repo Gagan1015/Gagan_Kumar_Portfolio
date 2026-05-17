@@ -4,6 +4,13 @@ const getEnvVar = (key: string, defaultValue: string) => {
   if (typeof window !== 'undefined' && (window as any)._env_) {
     return (window as any)._env_[key] || defaultValue;
   }
+  // Server-side rendering reads runtime env directly.
+  if (typeof window === 'undefined' && typeof process !== 'undefined') {
+    if (key === 'VITE_API_URL' && process.env?.SSR_API_URL) {
+      return process.env.SSR_API_URL;
+    }
+    return process.env?.[key] || defaultValue;
+  }
   // Fall back to build-time env (development)
   return import.meta.env[key] || defaultValue;
 };

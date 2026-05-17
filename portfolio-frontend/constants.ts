@@ -1,8 +1,6 @@
-import { Experience, Project, Education } from './types';
-
 export const PROFILE_SUMMARY = `I am a Senior Product Engineer focused on building intersectional digital experiences. With a background in architectural design and computer science, I approach frontend development with a spatial mindset. I specialize in high-performance React applications, design systems, and micro-interactions that elevate usability. Currently exploring the boundaries of Generative AI in UI patterns.`;
 
-export const EXPERIENCE_DATA: Experience[] = [
+export const EXPERIENCE_DATA = [
   {
     id: '1',
     role: 'Senior Frontend Engineer',
@@ -29,7 +27,7 @@ export const EXPERIENCE_DATA: Experience[] = [
   },
 ];
 
-export const PROJECTS_DATA: Project[] = [
+export const PROJECTS_DATA = [
   {
     id: '1',
     title: 'Lumina Interface',
@@ -64,7 +62,7 @@ export const PROJECTS_DATA: Project[] = [
   },
 ];
 
-export const EDUCATION_DATA: Education[] = [
+export const EDUCATION_DATA = [
   {
     id: '1',
     degree: 'B.S. Computer Science',

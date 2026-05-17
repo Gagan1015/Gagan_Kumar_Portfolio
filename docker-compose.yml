@@ -68,9 +68,10 @@ services:
     restart: unless-stopped
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api}
+      SSR_API_URL: ${SSR_API_URL:-http://api/api}
       VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-15000}
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       - api
     networks:

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { SectionId, Theme } from '../types';
 import { useProfile } from '../hooks/usePortfolio';
 import { resumeService } from '../services/portfolioService';
@@ -27,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(0);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const canUseDOM = typeof document !== 'undefined';
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -173,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
       </header>
 
       {/* ===================== MOBILE FLOATING HEADER (top pill) ===================== */}
-      {createPortal(
+      {canUseDOM && createPortal(
         <div
           className="mobile-header-pill md:hidden mobile-header-pill-visible"
         >
@@ -260,7 +261,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
       )}
 
       {/* ===================== MOBILE BOTTOM DOCK ===================== */}
-      {createPortal(
+      {canUseDOM && createPortal(
         <nav className="mobile-dock md:hidden" aria-label="Mobile navigation">
           {/* Home */}
           <button

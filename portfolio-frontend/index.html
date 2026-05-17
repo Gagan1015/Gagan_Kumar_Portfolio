@@ -5,48 +5,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Primary Meta Tags -->
-  <title>Gagan Kumar — Full-Stack Developer Portfolio</title>
-  <meta name="title" content="Gagan Kumar — Full-Stack Developer Portfolio" />
-  <meta name="description"
-    content="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog." />
-  <meta name="keywords"
-    content="Gagan Kumar, Full-Stack Developer, Software Engineer, React Developer, TypeScript, Laravel, Portfolio, Web Developer, Frontend Engineer, Backend Developer" />
-  <meta name="author" content="Gagan Kumar" />
-  <meta name="robots" content="index, follow" />
-  <meta name="language" content="English" />
-  <meta name="revisit-after" content="7 days" />
-  <meta name="theme-color" content="#121212" />
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        var theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://gagankumar.me/" />
+        document.documentElement.classList.remove('light', 'dark');
+        document.documentElement.classList.add(theme);
+        document.documentElement.style.colorScheme = theme;
+      } catch (error) {
+        document.documentElement.classList.add('light');
+        document.documentElement.style.colorScheme = 'light';
+      }
+    })();
+  </script>
+
+  <!--app-head-->
 
   <!-- Favicons -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="manifest" href="/manifest.json" />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://gagankumar.me/" />
-  <meta property="og:title" content="Gagan Kumar — Full-Stack Developer Portfolio" />
-  <meta property="og:description"
-    content="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog." />
-  <meta property="og:image" content="https://gagankumar.me/og-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:alt" content="Gagan Kumar — Full-Stack Developer Portfolio" />
-  <meta property="og:site_name" content="Gagan Kumar Portfolio" />
-  <meta property="og:locale" content="en_US" />
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://gagankumar.me/" />
-  <meta property="twitter:title" content="Gagan Kumar — Full-Stack Developer Portfolio" />
-  <meta property="twitter:description"
-    content="Full-Stack Developer specializing in React, TypeScript, Laravel & modern web tech. View projects, skills & blog." />
-  <meta property="twitter:image" content="https://gagankumar.me/og-image.png" />
 
   <script src="/env-config.js" defer></script>
 
@@ -89,42 +71,27 @@
     #root {
       min-height: 100vh
     }
-  </style>
 
+    .preloader-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f4f4f4
+    }
+
+    .dark .preloader-overlay {
+      background: #0a0a0a
+    }
+  </style>
 </head>
 
 <body>
-  <!-- Schema.org JSON-LD Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Gagan Kumar",
-    "url": "https://gagankumar.me",
-    "image": "https://gagankumar.me/og-image.png",
-    "jobTitle": "Full-Stack Developer",
-    "description": "Full-Stack Developer and Software Engineer specializing in React, TypeScript, Laravel, and modern web technologies.",
-    "sameAs": [
-      "https://linkedin.com/in/gagankumar",
-      "https://github.com/Gagan1015",
-      "https://x.com/gagankumar"
-    ],
-    "knowsAbout": ["React", "TypeScript", "Laravel", "PHP", "JavaScript", "Node.js", "Full-Stack Development", "Web Development", "Software Engineering"]
-  }
-  </script>
-  <!-- WebSite Schema for Search Box -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Gagan Kumar Portfolio",
-    "url": "https://gagankumar.me",
-    "description": "Portfolio website of Gagan Kumar — Full-Stack Developer and Software Engineer"
-  }
-  </script>
   <noscript>
     <div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:sans-serif">
-      <h1>Gagan Kumar — Full-Stack Developer & Software Engineer</h1>
+      <h1>Gagan Kumar - Full-Stack Developer & Software Engineer</h1>
       <p>Welcome to the portfolio of Gagan Kumar, a Full-Stack Developer specializing in React, TypeScript, Laravel,
         PHP, JavaScript, Node.js, and modern web technologies.</p>
       <h2>About</h2>
@@ -146,8 +113,9 @@
       </ul>
     </div>
   </noscript>
-  <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
+  <div id="root"><!--app-html--></div>
+  <!--app-state-->
+  <script type="module" src="/entry-client.tsx"></script>
 </body>
 
 </html>

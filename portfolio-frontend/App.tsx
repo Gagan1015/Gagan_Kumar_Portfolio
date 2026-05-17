@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { DehydratedState, HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Profile } from './components/Profile';
@@ -46,8 +46,7 @@ const BlogList = lazy(() => import('./components/BlogList').then(m => ({ default
 const BlogPostPage = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPostPage })));
 const ProjectsList = lazy(() => import('./components/ProjectsList').then(m => ({ default: m.ProjectsList })));
 
-// Create QueryClient instance
-const queryClient = new QueryClient({
+export const createPortfolioQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
@@ -83,13 +82,18 @@ const SectionDivider: React.FC = () => (
 );
 
 // Theme Provider Hook — with clip-path circle expand transition
+const getInitialTheme = (): Theme => {
+  if (typeof window === 'undefined') return 'light';
+
+  const saved = localStorage.getItem('theme') as Theme | null;
+  if (saved === 'light' || saved === 'dark') return saved;
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
 const useTheme = () => {
   // On first visit (no localStorage), detect system preference
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme') as Theme | null;
-    if (saved === 'light' || saved === 'dark') return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   // Ref to track the triggering element for clip-path origin
   const toggleOriginRef = useRef<{ x: number; y: number } | null>(null);
@@ -98,6 +102,7 @@ const useTheme = () => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
+    root.style.colorScheme = theme;
     localStorage.setItem('theme', theme);
   }, [theme]);
 
@@ -255,14 +260,18 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
-const AppContent: React.FC = () => {
+export const AppContent: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>(SectionId.Hero);
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   // Show preloader on every home page load
   const isHome = location.pathname === '/';
-  const [showPreloader, setShowPreloader] = useState(isHome);
+  const [showPreloader, setShowPreloader] = useState(() => isHome);
+
+  useEffect(() => {
+    setShowPreloader(isHome);
+  }, [isHome]);
 
   const handlePreloaderComplete = useCallback(() => {
     setShowPreloader(false);
@@ -325,12 +334,24 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+interface AppProps {
+  dehydratedState?: DehydratedState;
+  queryClient?: QueryClient;
+  router?: React.ReactNode;
+}
+
+const App: React.FC<AppProps> = ({ dehydratedState, queryClient, router }) => {
+  const [client] = useState(() => queryClient ?? createPortfolioQueryClient());
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+    <QueryClientProvider client={client}>
+      <HydrationBoundary state={dehydratedState}>
+        {router ?? (
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        )}
+      </HydrationBoundary>
     </QueryClientProvider>
   );
 };
