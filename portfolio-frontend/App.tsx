@@ -265,13 +265,16 @@ export const AppContent: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
-  // Show preloader on every home page load
+  // Show the preloader only for the initial document load of the home page.
+  // Route transitions back to "/" should feel instant instead of replaying it.
   const isHome = location.pathname === '/';
   const [showPreloader, setShowPreloader] = useState(() => isHome);
 
   useEffect(() => {
-    setShowPreloader(isHome);
-  }, [isHome]);
+    if (!isHome && showPreloader) {
+      setShowPreloader(false);
+    }
+  }, [isHome, showPreloader]);
 
   const handlePreloaderComplete = useCallback(() => {
     setShowPreloader(false);

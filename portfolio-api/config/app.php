@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'asset_url' => env('ASSET_URL'),
+
     'admin_domains' => array_values(array_filter(array_map(
         'trim',
         explode(',', (string) env('ADMIN_DOMAINS', ''))

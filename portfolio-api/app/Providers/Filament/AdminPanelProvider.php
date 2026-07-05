@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Gagan Kumar CMS')
             ->brandLogo(fn (): HtmlString => new HtmlString(view('filament.brand-logo')->render()))
             ->brandLogoHeight('2.35rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(asset('favicon.svg'))
             ->font('Inter')
             ->sidebarCollapsibleOnDesktop()
             ->spa()
