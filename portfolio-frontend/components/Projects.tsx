@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useProjects } from '../hooks/usePortfolio';
 import { useProjectQuickView } from '../hooks/useProjectQuickView';
@@ -8,6 +8,7 @@ import { ProjectQuickView } from './ProjectQuickView';
 
 export const Projects: React.FC = () => {
   const { data: projects, isLoading, error } = useProjects();
+  const selectedProjects = useMemo(() => projects?.slice(0, 4) ?? [], [projects]);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [visibleRows, setVisibleRows] = useState<Set<number>>(new Set());
@@ -56,7 +57,7 @@ export const Projects: React.FC = () => {
     });
 
     return () => observers.forEach((observer) => observer.disconnect());
-  }, [projects]);
+  }, [selectedProjects]);
 
   if (isLoading) {
     return (
@@ -101,7 +102,7 @@ export const Projects: React.FC = () => {
             </h2>
             <div className="mt-4 h-px w-12 bg-black dark:bg-white" />
             <p className="mt-4 text-sm font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600">
-              {projects.length} Projects
+              {selectedProjects.length} Projects
             </p>
           </div>
           <div className="md:col-span-7 md:flex md:items-end md:justify-end">
@@ -126,7 +127,7 @@ export const Projects: React.FC = () => {
         <div className="mb-0 h-px bg-black dark:bg-white" />
 
         <div className="relative">
-          {projects.map((project, index) => {
+          {selectedProjects.map((project, index) => {
             const isHovered = hoveredId === project.id;
             const isVisible = visibleRows.has(index);
             const isSelected = activeProject?.id === project.id && phase !== 'measuring';
@@ -289,8 +290,8 @@ export const Projects: React.FC = () => {
         >
           <div className="h-full w-full overflow-hidden border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-black dark:shadow-none">
             <img
-              src={optimizeCloudinaryUrl(projects.find((project) => project.id === hoveredId)?.image_url || '', 640)}
-              alt={`Preview of ${projects.find((project) => project.id === hoveredId)?.title || 'project'}`}
+              src={optimizeCloudinaryUrl(selectedProjects.find((project) => project.id === hoveredId)?.image_url || '', 640)}
+              alt={`Preview of ${selectedProjects.find((project) => project.id === hoveredId)?.title || 'project'}`}
               className="h-full w-full object-cover"
               width={640}
               height={400}

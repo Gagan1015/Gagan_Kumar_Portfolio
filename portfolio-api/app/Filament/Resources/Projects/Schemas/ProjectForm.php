@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
+use App\Support\CloudinaryUrl;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -34,6 +36,13 @@ class ProjectForm
                     ->directory('projects')
                     ->disk('cloudinary')
                     ->visibility('public')
+                    ->fetchFileInformation(false)
+                    ->getUploadedFileUsing(static fn (BaseFileUpload $component, string $file, string|array|null $storedFileNames): array => [
+                        'name' => ($component->isMultiple() ? ($storedFileNames[$file] ?? null) : $storedFileNames) ?? basename($file),
+                        'size' => 0,
+                        'type' => null,
+                        'url' => CloudinaryUrl::image($file),
+                    ])
                     ->imageEditor()
                     ->maxSize(5120) // 5MB
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])

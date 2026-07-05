@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\CloudinaryUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -43,7 +44,7 @@ class ProjectResource extends JsonResource
      */
     private function getImageUrl(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 
@@ -54,19 +55,15 @@ class ProjectResource extends JsonResource
 
         // Get the configured filesystem disk
         $disk = config('filesystems.default');
-        
+
         // For Cloudinary, return the URL directly
         if ($disk === 'cloudinary') {
-            try {
-                return Storage::disk('cloudinary')->url($path);
-            } catch (\Exception $e) {
-                // If Cloudinary fails, fall through to placeholder
-            }
+            return CloudinaryUrl::image($path);
         }
-        
+
         // For public disk, check if file exists
         if ($disk === 'public' && Storage::disk('public')->exists($path)) {
-            return url('storage/' . $path);
+            return url('storage/'.$path);
         }
 
         // Return a placeholder image if file doesn't exist
@@ -77,9 +74,10 @@ class ProjectResource extends JsonResource
             'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=800&h=600&fit=crop', // Immigration/Services
             'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop', // E-commerce
         ];
-        
+
         // Use project ID to consistently map to a placeholder
         $index = ($this->id - 1) % count($placeholders);
+
         return $placeholders[$index];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BlogPosts\Tables;
 
+use App\Support\CloudinaryUrl;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -31,6 +32,8 @@ class BlogPostsTable
                     ->badge(),
                 ImageColumn::make('featured_image')
                     ->label('Image')
+                    ->getStateUsing(fn ($record): ?string => CloudinaryUrl::image($record->featured_image))
+                    ->checkFileExistence(false)
                     ->circular(),
                 TextColumn::make('reading_time')
                     ->label('Read Time')

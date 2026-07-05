@@ -30,6 +30,10 @@ function getDuration(start: string | null, end: string | null): string {
   return years <= 1 ? '1 year' : `${years} years`;
 }
 
+function formatCompletionYear(end: string | null): string {
+  return end ? String(new Date(end).getFullYear()) : 'Present';
+}
+
 export const Education: React.FC = () => {
   const { data: education, isLoading, error } = useEducation();
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
@@ -117,7 +121,6 @@ export const Education: React.FC = () => {
             {education.map((edu, index) => {
               const logo = getInstitutionLogo(edu.institution);
               const isVisible = visibleCards.has(index);
-              const duration = getDuration(edu.start_date, edu.end_date);
 
               return (
                 <div
@@ -185,20 +188,11 @@ export const Education: React.FC = () => {
                                 )}
                               </div>
 
-                              {/* Date & Duration */}
+                              {/* Completion year */}
                               <div className="flex flex-col items-start md:items-end gap-1 flex-shrink-0">
                                 <span className="font-mono text-sm text-black dark:text-white font-medium">
-                                  {formatDateRange(edu.start_date, edu.end_date)}
+                                  {formatCompletionYear(edu.end_date)}
                                 </span>
-                                {duration && (
-                                  <span className="font-mono text-[11px] text-neutral-400 dark:text-neutral-600 flex items-center gap-1.5">
-                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <circle cx="12" cy="12" r="10" />
-                                      <polyline points="12 6 12 12 16 14" />
-                                    </svg>
-                                    {duration}
-                                  </span>
-                                )}
                               </div>
                             </div>
 

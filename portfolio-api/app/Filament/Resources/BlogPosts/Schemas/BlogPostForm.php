@@ -2,15 +2,17 @@
 
 namespace App\Filament\Resources\BlogPosts\Schemas;
 
+use App\Support\CloudinaryUrl;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
@@ -74,6 +76,13 @@ class BlogPostForm
                     ->directory('blog')
                     ->disk('cloudinary')
                     ->visibility('public')
+                    ->fetchFileInformation(false)
+                    ->getUploadedFileUsing(static fn (BaseFileUpload $component, string $file, string|array|null $storedFileNames): array => [
+                        'name' => ($component->isMultiple() ? ($storedFileNames[$file] ?? null) : $storedFileNames) ?? basename($file),
+                        'size' => 0,
+                        'type' => null,
+                        'url' => CloudinaryUrl::image($file),
+                    ])
                     ->imageEditor()
                     ->maxSize(5120) // 5MB
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
@@ -137,6 +146,13 @@ class BlogPostForm
                             ->directory('blog-og')
                             ->disk('cloudinary')
                             ->visibility('public')
+                            ->fetchFileInformation(false)
+                            ->getUploadedFileUsing(static fn (BaseFileUpload $component, string $file, string|array|null $storedFileNames): array => [
+                                'name' => ($component->isMultiple() ? ($storedFileNames[$file] ?? null) : $storedFileNames) ?? basename($file),
+                                'size' => 0,
+                                'type' => null,
+                                'url' => CloudinaryUrl::image($file),
+                            ])
                             ->maxSize(2048) // 2MB
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->helperText('Custom image for social media sharing. Falls back to featured image if empty. Recommended: 1200×630px.'),

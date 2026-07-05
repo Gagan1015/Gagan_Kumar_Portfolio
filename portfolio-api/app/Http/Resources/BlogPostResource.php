@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\CloudinaryUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +43,7 @@ class BlogPostResource extends JsonResource
      */
     private function getImageUrl(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 
@@ -56,16 +57,12 @@ class BlogPostResource extends JsonResource
 
         // For Cloudinary, return the URL directly
         if ($disk === 'cloudinary') {
-            try {
-                return Storage::disk('cloudinary')->url($path);
-            } catch (\Exception $e) {
-                // If Cloudinary fails, fall through to placeholder
-            }
+            return CloudinaryUrl::image($path);
         }
 
         // For public disk, check if file exists
         if ($disk === 'public' && Storage::disk('public')->exists($path)) {
-            return url('storage/' . $path);
+            return url('storage/'.$path);
         }
 
         // Return a placeholder image if file doesn't exist
@@ -77,6 +74,7 @@ class BlogPostResource extends JsonResource
         ];
 
         $index = ($this->id - 1) % count($placeholders);
+
         return $placeholders[$index];
     }
 }

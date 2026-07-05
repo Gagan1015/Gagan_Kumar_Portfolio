@@ -1,15 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\ExperienceController;
-use App\Http\Controllers\Api\EducationController;
-use App\Http\Controllers\Api\ProjectController;
-use App\Http\Controllers\Api\SkillController;
-use App\Http\Controllers\Api\SettingController;
-use App\Http\Controllers\Api\ResumeController;
 use App\Http\Controllers\Api\BlogPostController;
+use App\Http\Controllers\Api\EducationController;
+use App\Http\Controllers\Api\ExperienceController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\ResumeController;
+use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\SkillController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,27 +27,6 @@ Route::get('/profile', [ProfileController::class, 'index']);
 // Resume endpoints
 Route::get('/resume/download', [ResumeController::class, 'download']);
 Route::post('/resume/upload', [ResumeController::class, 'upload']);
-
-// Debug endpoint - remove after testing
-Route::get('/resume/debug', function() {
-    $profile = \App\Models\Profile::first();
-    if (!$profile) {
-        return response()->json(['message' => 'No profile found'], 404);
-    }
-    
-    $cloudName = config('filesystems.disks.cloudinary.cloud');
-    $resumePath = $profile->resume_url;
-    $cleanPath = ltrim($resumePath, '/');
-    $constructedUrl = "https://res.cloudinary.com/{$cloudName}/raw/upload/{$cleanPath}";
-    
-    return response()->json([
-        'raw_resume_url' => $resumePath,
-        'cloud_name' => $cloudName,
-        'clean_path' => $cleanPath,
-        'constructed_url' => $constructedUrl,
-        'note' => 'Path stored WITH .pdf extension, used as-is'
-    ]);
-});
 
 // Experience endpoints
 Route::get('/experiences', [ExperienceController::class, 'index']);
@@ -75,4 +53,3 @@ Route::get('/blog', [BlogPostController::class, 'index']);
 Route::get('/blog/featured', [BlogPostController::class, 'featured']);
 Route::get('/blog/categories', [BlogPostController::class, 'categories']);
 Route::get('/blog/{slug}', [BlogPostController::class, 'show']);
-

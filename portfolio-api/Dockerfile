@@ -24,6 +24,9 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 # Configure PHP extensions
 RUN docker-php-ext-configure intl
 
+# Allow Filament/Livewire uploads above PHP's default 2MB limit.
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Tables;
 
+use App\Support\CloudinaryUrl;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -22,7 +23,9 @@ class ProjectsTable
                     ->searchable(),
                 TextColumn::make('category')
                     ->searchable(),
-                ImageColumn::make('image_url'),
+                ImageColumn::make('image_url')
+                    ->getStateUsing(fn ($record): ?string => CloudinaryUrl::image($record->image_url))
+                    ->checkFileExistence(false),
                 TextColumn::make('github_url')
                     ->searchable(),
                 TextColumn::make('demo_url')
