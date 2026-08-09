@@ -104,9 +104,7 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, theme, onToggleTh
     <>
       {/* ===================== DESKTOP HEADER ===================== */}
       <header
-        className={`fixed top-0 left-0 w-full z-40 transition-all hidden md:block ${
-          isScrolled ? 'py-4' : 'py-6'
-        }`}
+        className="fixed top-0 left-0 w-full z-40 transition-all hidden md:block py-2"
       >
         <div className={`mx-auto max-w-7xl flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] border border-transparent px-6 md:px-12 ${
           isScrolled ? 'desktop-header-pill py-3' : 'py-3'

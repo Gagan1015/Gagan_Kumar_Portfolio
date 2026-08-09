@@ -74,7 +74,7 @@ const LocalTime: React.FC = () => {
   }, []);
 
   return (
-    <span className="font-mono text-xs tabular-nums text-neutral-500 dark:text-neutral-500">
+    <span className="font-mono text-xs tabular-nums text-neutral-500 dark:text-white/60">
       {time} IST
     </span>
   );
@@ -184,10 +184,22 @@ export const Footer: React.FC = () => {
   return (
     <footer
       ref={footerRef}
-      className="relative bg-[#f4f4f4] dark:bg-[#050505] text-neutral-900 dark:text-white overflow-hidden transition-colors duration-300 pb-24 md:pb-0"
+      className="footer-on-media relative isolate min-h-[560px] overflow-hidden bg-[#f4f4f4] pb-24 text-neutral-900 transition-colors duration-300 md:min-h-[720px] md:pb-0 dark:bg-[#050505] dark:text-white"
     >
+      {/* ─── Full-bleed background artwork ─── */}
+      <div className="footer-media" aria-hidden="true">
+        <img
+          src="/footer-image.png"
+          alt=""
+          className="footer-media-img"
+          loading="lazy"
+          decoding="async"
+        />
+        <div className="footer-media-scrim" />
+      </div>
+
       {/* ─── Main content ─── */}
-      <div className="section-frame">
+      <div className="section-frame relative z-10">
         <div className="section-frame-inner pb-10 pt-14 md:pb-12 md:pt-24">
 
         {/* ROW 1: Big CTA */}
@@ -197,7 +209,7 @@ export const Footer: React.FC = () => {
           }`}
         >
           {isLoading ? (
-            <div className="h-20 md:h-32 w-3/4 bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded" />
+            <div className="h-20 md:h-32 w-3/4 bg-neutral-900/10 dark:bg-white/10 animate-pulse rounded" />
           ) : (
             <CTAText
               text="Let's work together"
@@ -245,9 +257,9 @@ export const Footer: React.FC = () => {
               <div className="flex items-center gap-3">
                 {isLoading ? (
                   <>
-                    <span className="w-10 h-10 bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-full" />
-                    <span className="w-10 h-10 bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-full" />
-                    <span className="w-10 h-10 bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-full" />
+                    <span className="w-10 h-10 bg-neutral-900/10 dark:bg-white/10 animate-pulse rounded-full" />
+                    <span className="w-10 h-10 bg-neutral-900/10 dark:bg-white/10 animate-pulse rounded-full" />
+                    <span className="w-10 h-10 bg-neutral-900/10 dark:bg-white/10 animate-pulse rounded-full" />
                   </>
                 ) : (
                   socialLinks.map(
@@ -285,8 +297,8 @@ export const Footer: React.FC = () => {
             <div className="mt-4 space-y-3">
               {/* Location */}
               {!isLoading && profile?.location && (
-                <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="flex-shrink-0 text-neutral-400 dark:text-neutral-600">
+                <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-white/70">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="flex-shrink-0 text-neutral-400 dark:text-white/45">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
@@ -296,7 +308,7 @@ export const Footer: React.FC = () => {
 
               {/* Local time */}
               <div className="flex items-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="flex-shrink-0 text-neutral-400 dark:text-neutral-600">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="flex-shrink-0 text-neutral-400 dark:text-white/45">
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
@@ -304,7 +316,7 @@ export const Footer: React.FC = () => {
               </div>
 
               {/* Availability status */}
-              <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+              <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-white/70">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
@@ -317,12 +329,12 @@ export const Footer: React.FC = () => {
 
         {/* ─── Bottom bar ─── */}
         <div
-          className={`mt-12 border-t border-neutral-200/60 pt-6 transition-all duration-700 ease-out delay-300 dark:border-neutral-800/60 md:mt-20 ${
+          className={`mt-12 border-t border-neutral-900/15 pt-6 transition-all duration-700 ease-out delay-300 dark:border-white/15 md:mt-20 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           } flex flex-col items-start justify-between gap-4 md:flex-row md:items-center`}
         >
           <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-6">
-            <span className="text-[11px] font-mono text-neutral-500 dark:text-neutral-500">
+            <span className="text-[11px] font-mono text-neutral-500 dark:text-white/60">
               &copy; {currentYear} &mdash; Built with ❤️ by Gagan Kumar
             </span>
           </div>
@@ -333,7 +345,7 @@ export const Footer: React.FC = () => {
             className="footer-back-to-top group"
             aria-label="Back to top"
           >
-            <span className="text-[11px] font-mono uppercase tracking-widest text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-neutral-500 transition-colors group-hover:text-neutral-900 dark:text-white/60 dark:group-hover:text-white">
               Back to top
             </span>
             <span className="footer-back-to-top-icon">
@@ -349,7 +361,7 @@ export const Footer: React.FC = () => {
 
       {/* ─── Decorative grid overlay ─── */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.03]"
+        className="absolute inset-0 z-[1] pointer-events-none opacity-[0.04] dark:opacity-0"
         style={{
           backgroundImage:
             'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px)',
@@ -357,7 +369,7 @@ export const Footer: React.FC = () => {
         }}
       />
       <div
-        className="absolute inset-0 pointer-events-none opacity-0 dark:opacity-[0.03]"
+        className="absolute inset-0 z-[1] pointer-events-none opacity-0 dark:opacity-[0.04]"
         style={{
           backgroundImage:
             'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px)',
