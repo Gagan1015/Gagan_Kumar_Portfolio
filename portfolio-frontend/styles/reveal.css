@@ -1,0 +1,123 @@
+/* ============================================================
+   GLOBAL REVEAL SYSTEM
+   Opacity + blur + transform entrance animations, driven by a
+   single shared IntersectionObserver (hooks/useReveal.ts).
+
+   Contract
+   --------
+   data-reveal="<variant>"    Opt in. Variants: up (default) | fade |
+                              left | right | scale | line
+   data-reveal-delay="120"    Per-element delay in ms
+   data-reveal-stagger="90"   On a parent: staggers its [data-reveal] children
+
+   Two rules when applying this
+   ----------------------------
+   1. Put it on non-interactive wrappers only. While an element is animating
+      this sets the `transition` shorthand, which would clobber that element's
+      own hover transitions. Wrap the interactive thing instead of tagging it.
+   2. Never put it on an ancestor of a `position: fixed` or `sticky` element.
+      A CSS filter creates a containing block and would break the positioning.
+      That rules out the page shells, <main>, the header, the AI chat, the
+      project modal, and the blog post's table-of-contents column.
+
+   The hidden state only applies while <html> carries .reveal-enabled, which a
+   blocking script in index.html adds. No JS, no IntersectionObserver, reduced
+   motion, or a bundle that fails to boot all mean the class is absent or gets
+   removed, so content is never stranded behind an animation that never runs.
+   ============================================================ */
+
+:root {
+    --reveal-distance: 28px;
+    --reveal-blur: 8px;
+    --reveal-scale: 0.97;
+    /* Movement outlasts the fade and the blur on purpose: the element is
+       already legible while it finishes settling, which reads as considered
+       rather than slow. */
+    --reveal-duration: 1000ms;
+    --reveal-duration-fade: 700ms;
+    --reveal-duration-blur: 820ms;
+    --reveal-delay: 0ms;
+    /* Fully decelerating curves, no overshoot. */
+    --reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --reveal-ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Transition applies only while the reveal is in flight. Once .reveal-done
+   lands the element stops matching this rule, handing its `transition` back to
+   whatever Tailwind utilities or component CSS it carries. */
+.reveal-enabled [data-reveal]:not(.reveal-done) {
+    transition: opacity var(--reveal-duration-fade) var(--reveal-ease-soft)
+            var(--reveal-delay),
+        filter var(--reveal-duration-blur) var(--reveal-ease-soft)
+            var(--reveal-delay),
+        transform var(--reveal-duration) var(--reveal-ease) var(--reveal-delay);
+}
+
+/* ─── Hidden state ─── */
+.reveal-enabled [data-reveal]:not(.is-revealed) {
+    opacity: 0;
+    filter: blur(var(--reveal-blur));
+    transform: translate3d(0, var(--reveal-distance), 0);
+}
+
+.reveal-enabled [data-reveal='fade']:not(.is-revealed) {
+    transform: none;
+}
+
+.reveal-enabled [data-reveal='left']:not(.is-revealed) {
+    transform: translate3d(calc(var(--reveal-distance) * -1), 0, 0);
+}
+
+.reveal-enabled [data-reveal='right']:not(.is-revealed) {
+    transform: translate3d(var(--reveal-distance), 0, 0);
+}
+
+.reveal-enabled [data-reveal='scale']:not(.is-revealed) {
+    transform: translate3d(0, calc(var(--reveal-distance) * 0.5), 0)
+        scale(var(--reveal-scale));
+}
+
+/* Rules and dividers wipe out from their leading edge instead of sliding.
+   No blur here — a 1px line just smears. */
+.reveal-enabled [data-reveal='line'] {
+    transform-origin: left center;
+}
+
+.reveal-enabled [data-reveal='line']:not(.is-revealed) {
+    opacity: 1;
+    filter: none;
+    transform: scaleX(0);
+}
+
+/* ─── Revealed state ─── */
+.reveal-enabled [data-reveal].is-revealed {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+}
+
+.reveal-enabled [data-reveal='line'].is-revealed {
+    transform: scaleX(1);
+}
+
+/* ─── Settled state ─── */
+/* Drops the filter entirely once the animation is over. blur(0) is still a
+   filter, so it would keep creating a containing block and a compositing layer
+   for the life of the page. */
+.reveal-enabled [data-reveal].reveal-done {
+    opacity: 1;
+    filter: none;
+    transform: none;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+    .reveal-enabled [data-reveal],
+    .reveal-enabled [data-reveal]:not(.is-revealed),
+    .reveal-enabled [data-reveal]:not(.reveal-done) {
+        opacity: 1 !important;
+        filter: none !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}

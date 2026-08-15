@@ -208,8 +208,11 @@ export const Profile: React.FC = () => {
     >
       <div className="section-frame">
         <div className="section-frame-inner">
-          <div className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8">
-            <div className="md:col-span-4">
+          <div
+            className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8"
+            data-reveal-stagger="110"
+          >
+            <div className="md:col-span-4" data-reveal="up">
               <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
                 PROFILE<span className="text-neutral-300 dark:text-neutral-700">.</span>
               </h2>
@@ -218,17 +221,20 @@ export const Profile: React.FC = () => {
                 Core Snapshot
               </p>
             </div>
-            <div className="md:col-span-8 md:flex md:items-end md:justify-end">
+            <div className="md:col-span-8 md:flex md:items-end md:justify-end" data-reveal="up">
               <p className="text-lg leading-relaxed text-neutral-500 dark:text-neutral-400 md:max-w-xl md:text-right">
                 Full-stack execution with a backend-first mindset, resilient systems thinking, and interfaces that feel considered instead of overdesigned.
               </p>
             </div>
           </div>
 
-          <div className="h-px bg-black dark:bg-white" />
+          <div className="h-px bg-black dark:bg-white" data-reveal="line" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12">
-            <div className="border-b border-neutral-200 dark:border-neutral-800 lg:col-span-7 lg:border-b-0 lg:border-r">
+          <div className="grid grid-cols-1 lg:grid-cols-12" data-reveal-stagger="130">
+            <div
+              className="border-b border-neutral-200 dark:border-neutral-800 lg:col-span-7 lg:border-b-0 lg:border-r"
+              data-reveal="up"
+            >
               <div className="p-6 md:p-8 lg:p-10">
                 <div className="mb-8 flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-2 border border-neutral-200 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
@@ -270,7 +276,7 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5" data-reveal="up">
               <div className="space-y-px bg-neutral-200 dark:bg-neutral-800">
                 <div className="grid grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800">
                   {stats.map((stat, index) => {
@@ -319,7 +325,7 @@ export const Profile: React.FC = () => {
             </div>
           </div>
 
-          <div className="h-px bg-black dark:bg-white" />
+          <div className="h-px bg-black dark:bg-white" data-reveal="line" />
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './styles/custom.css';
+@import './styles/reveal.css';
 
 /* Use class-based dark mode (equivalent to darkMode: 'class' in Tailwind v3) */
 @variant dark (&:where(.dark, .dark *));

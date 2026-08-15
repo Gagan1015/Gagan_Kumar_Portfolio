@@ -9,6 +9,7 @@ import { SEOHead } from './components/SEOHead';
 import { Preloader } from './components/Preloader';
 import { SectionId, Theme } from './types';
 import { useProfile } from './hooks/usePortfolio';
+import { useRevealSystem } from './hooks/useReveal';
 
 // Lazy-load below-the-fold home sections to reduce initial JS payload
 const Projects = lazy(() => import('./components/Projects').then(m => ({ default: m.Projects })));
@@ -264,6 +265,9 @@ export const AppContent: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>(SectionId.Hero);
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+
+  // Enables scroll reveals for every route
+  useRevealSystem();
 
   // Show the preloader only for the initial document load of the home page.
   // Route transitions back to "/" should feel instant instead of replaying it.

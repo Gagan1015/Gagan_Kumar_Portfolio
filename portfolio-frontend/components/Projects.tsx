@@ -95,8 +95,11 @@ export const Projects: React.FC = () => {
     >
       <div className="section-frame">
         <div className="section-frame-inner">
-        <div className="mb-12 grid grid-cols-1 gap-6 md:mb-20 md:grid-cols-12 md:gap-8">
-          <div className="md:col-span-5">
+        <div
+          className="mb-12 grid grid-cols-1 gap-6 md:mb-20 md:grid-cols-12 md:gap-8"
+          data-reveal-stagger="110"
+        >
+          <div className="md:col-span-5" data-reveal="up">
             <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
               SELECTED WORK<span className="text-neutral-300 dark:text-neutral-700">.</span>
             </h2>
@@ -105,7 +108,7 @@ export const Projects: React.FC = () => {
               {selectedProjects.length} Projects
             </p>
           </div>
-          <div className="md:col-span-7 md:flex md:items-end md:justify-end">
+          <div className="md:col-span-7 md:flex md:items-end md:justify-end" data-reveal="up">
             <div className="md:text-right">
               <p className="text-lg leading-relaxed text-neutral-500 dark:text-neutral-400 md:max-w-md">
                 A curation of digital products, websites, and experimental interfaces.
@@ -124,7 +127,7 @@ export const Projects: React.FC = () => {
           </div>
         </div>
 
-        <div className="mb-0 h-px bg-black dark:bg-white" />
+        <div className="mb-0 h-px bg-black dark:bg-white" data-reveal="line" />
 
         <div className="relative">
           {selectedProjects.map((project, index) => {

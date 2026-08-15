@@ -194,21 +194,23 @@ export const BlogPostPage: React.FC = () => {
       <div className="section-frame min-h-screen">
         <div className="section-frame-inner h-full">
       {/* Header area */}
-      <div className="max-w-4xl mx-auto pt-6 md:pt-32">
-        {/* Back link */}
-        <Link 
-          to="/blog" 
-          className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 mb-10 group"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:-translate-x-1">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Back to Blog
-        </Link>
+      <div className="max-w-4xl mx-auto pt-6 md:pt-32" data-reveal-stagger="90">
+        {/* Back link — wrapped so the reveal doesn't override the link's own hover transition */}
+        <div data-reveal="fade">
+          <Link 
+            to="/blog" 
+            className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 mb-10 group"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:-translate-x-1">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Blog
+          </Link>
+        </div>
 
         {/* Post Meta */}
-        <div className="flex items-center gap-3 mb-5 flex-wrap">
+        <div className="flex items-center gap-3 mb-5 flex-wrap" data-reveal="up">
           {post.category && (
             <span className="text-[11px] font-mono uppercase tracking-[0.15em] px-3 py-1 border border-black dark:border-white text-black dark:text-white">
               {post.category}
@@ -230,24 +232,30 @@ export const BlogPostPage: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h1 className="font-display text-3xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-black dark:text-white leading-[1.1] mb-6">
+        <h1
+          className="font-display text-3xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-black dark:text-white leading-[1.1] mb-6"
+          data-reveal="up"
+        >
           {post.title}
         </h1>
 
         {/* Excerpt */}
         {post.excerpt && (
-          <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-2xl mb-8">
+          <p
+            className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-2xl mb-8"
+            data-reveal="up"
+          >
             {post.excerpt}
           </p>
         )}
 
         {/* Divider */}
-        <div className="h-px bg-neutral-200 dark:bg-neutral-800 mb-10" />
+        <div className="h-px bg-neutral-200 dark:bg-neutral-800 mb-10" data-reveal="line" />
       </div>
 
       {/* Featured Image */}
       {post.featured_image && (
-        <div className="max-w-5xl mx-auto mb-12">
+        <div className="max-w-5xl mx-auto mb-12" data-reveal="scale">
           <div className="blog-featured-image-wrapper">
             <img
               src={optimizeCloudinaryUrl(post.featured_image, 1000)}
@@ -266,7 +274,7 @@ export const BlogPostPage: React.FC = () => {
         <div className="flex gap-12 items-start">
           {/* Main Content */}
           <div className="flex-1 min-w-0 max-w-4xl mx-auto">
-            <div className="blog-prose">
+            <div className="blog-prose" data-reveal="fade">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeSlug, rehypeHighlight]}
@@ -332,7 +340,10 @@ export const BlogPostPage: React.FC = () => {
 
             {/* Tags Section Below Content */}
             {post.tags && post.tags.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+              <div
+                className="mt-12 pt-8 border-t border-neutral-200 dark:border-neutral-800"
+                data-reveal="up"
+              >
                 <span className="text-[11px] font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-600 block mb-4">
                   Tags
                 </span>
@@ -384,13 +395,16 @@ export const BlogPostPage: React.FC = () => {
       {relatedPosts.length > 0 && (
         <div className="border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-[#0d0d0d] transition-colors duration-300">
           <div className="mx-auto py-20">
-            <h2 className="font-display text-2xl font-medium tracking-tight text-black dark:text-white mb-12">
+            <h2
+              className="font-display text-2xl font-medium tracking-tight text-black dark:text-white mb-12"
+              data-reveal="up"
+            >
               Related Articles<span className="text-neutral-300 dark:text-neutral-700">.</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8" data-reveal-stagger="110">
               {relatedPosts.map(related => (
+                <div key={related.slug} data-reveal="scale">
                 <Link
-                  key={related.slug}
                   to={`/blog/${related.slug}`}
                   className="group block"
                 >
@@ -422,6 +436,7 @@ export const BlogPostPage: React.FC = () => {
                     {related.title}
                   </h3>
                 </Link>
+                </div>
               ))}
             </div>
           </div>

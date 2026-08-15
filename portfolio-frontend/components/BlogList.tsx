@@ -69,7 +69,7 @@ export const BlogList: React.FC = () => {
       <div className="section-frame min-h-screen">
         <div className="section-frame-inner h-full">
       {/* Back to Portfolio Link */}
-      <div className="pt-6 md:pt-32">
+      <div className="pt-6 md:pt-32" data-reveal="fade">
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-300 group"
@@ -104,7 +104,7 @@ export const BlogList: React.FC = () => {
 
       {/* Category Filter Tabs */}
       {categories && categories.length > 0 && (
-        <div className="pb-12">
+        <div className="pb-12" data-reveal="up" data-reveal-delay="180">
           <div className="flex items-center gap-1 flex-wrap">
             <button
               onClick={() => setSelectedCategory(undefined)}
@@ -269,7 +269,10 @@ export const BlogList: React.FC = () => {
 
               {/* Pagination */}
               {blogData?.meta?.last_page > 1 && (
-                <div className="flex items-center justify-center gap-4 mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+                <div
+                  className="flex items-center justify-center gap-4 mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800"
+                  data-reveal="fade"
+                >
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page <= 1}

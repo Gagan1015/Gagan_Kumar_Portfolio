@@ -96,7 +96,7 @@ export const ProjectsList: React.FC = () => {
     <div className="projects-page min-h-screen bg-[#f4f4f4] transition-colors duration-300 dark:bg-geo-dark-bg">
       <div className="section-frame min-h-screen">
         <div className="section-frame-inner h-full">
-      <div className="pt-6 md:px-12 md:pt-32">
+      <div className="pt-6 md:px-12 md:pt-32" data-reveal="fade">
         <Link
           to="/"
           className="group inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-neutral-400 transition-colors duration-300 hover:text-black dark:hover:text-white"
@@ -182,7 +182,10 @@ export const ProjectsList: React.FC = () => {
       {!isLoading && !error && (
         <div className="pb-24 md:px-12">
           {filteredProjects.length === 0 ? (
-            <div className="border border-neutral-200 p-16 text-center dark:border-neutral-800">
+            <div
+              className="border border-neutral-200 p-16 text-center dark:border-neutral-800"
+              data-reveal="scale"
+            >
               <p className="text-lg text-neutral-500 dark:text-neutral-400">
                 No projects found for this category.
               </p>

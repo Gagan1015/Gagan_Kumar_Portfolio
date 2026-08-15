@@ -1085,6 +1085,22 @@ body {
     .hero-content {
         padding-top: clamp(5.5rem, 11vh, 7rem);
     }
+
+    /* The image is 1579x766, so once it's width-constrained by a phone it is
+       only ~180px tall and cannot fill a 100svh hero. .hero-image-section is
+       flex: 1 1 auto, so it absorbed all that leftover height as blank space
+       above the image — and the narrower the screen, the shorter the image and
+       the wider the gap. On phones the hero is content-driven instead: there is
+       no free space to distribute, so the spacing below the CTA is fixed. */
+    .hero-section {
+        min-height: auto;
+    }
+
+    .hero-image-section {
+        flex: 0 0 auto;
+        align-items: flex-start;
+        margin-top: clamp(1.25rem, 5vw, 2.25rem);
+    }
 }
 
 /* ─── Hero Image Section ─── */

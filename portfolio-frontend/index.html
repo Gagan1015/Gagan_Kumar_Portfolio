@@ -23,6 +23,32 @@
     })();
   </script>
 
+  <script>
+    /* Gate for the global reveal system (styles/reveal.css + hooks/useReveal.ts).
+       Runs before first paint so revealed content never flashes in then out.
+       Elements stay in their final state unless this class is present, which
+       covers no-JS, no IntersectionObserver, and reduced-motion visitors. */
+    (function () {
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!('IntersectionObserver' in window)) return;
+
+        var root = document.documentElement;
+        root.classList.add('reveal-enabled');
+
+        /* Failsafe: if the bundle never boots the observer, drop the gate so
+           content can't be left invisible behind an animation that won't run. */
+        window.setTimeout(function () {
+          if (!root.classList.contains('reveal-booted')) {
+            root.classList.remove('reveal-enabled');
+          }
+        }, 4000);
+      } catch (error) {
+        document.documentElement.classList.remove('reveal-enabled');
+      }
+    })();
+  </script>
+
   <!--app-head-->
 
   <!-- Favicons -->

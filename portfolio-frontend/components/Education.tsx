@@ -94,8 +94,11 @@ export const Education: React.FC = () => {
       <div className="section-frame">
         <div className="section-frame-inner">
         {/* Section Header */}
-        <div className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8">
-          <div className="md:col-span-4">
+        <div
+          className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8"
+          data-reveal-stagger="110"
+        >
+          <div className="md:col-span-4" data-reveal="up">
             <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
               EDUCATION<span className="text-neutral-300 dark:text-neutral-700">.</span>
             </h2>
@@ -104,7 +107,7 @@ export const Education: React.FC = () => {
               Academic Journey
             </p>
           </div>
-          <div className="md:col-span-8">
+          <div className="md:col-span-8" data-reveal="up">
             <p className="text-neutral-500 dark:text-neutral-400 text-lg leading-relaxed">
               From foundational concepts to advanced engineering — a structured path through
               Computer Science and Technology.

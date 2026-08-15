@@ -88,6 +88,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
   return (
     <article
       className="group relative border-b border-neutral-200 dark:border-neutral-800 last:border-b-0"
+      data-reveal="up"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -369,8 +370,11 @@ export const Experience: React.FC = () => {
     >
       <div className="section-frame">
         <div className="section-frame-inner">
-          <div className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8">
-            <div className="md:col-span-4">
+          <div
+            className="mb-12 grid grid-cols-1 gap-6 md:mb-16 md:grid-cols-12 md:gap-8"
+            data-reveal-stagger="110"
+          >
+            <div className="md:col-span-4" data-reveal="up">
               <h2 className="font-display text-4xl font-medium tracking-tight text-black dark:text-white">
                 EXPERIENCE<span className="text-neutral-300 dark:text-neutral-700">.</span>
               </h2>
@@ -379,7 +383,7 @@ export const Experience: React.FC = () => {
                 Career Timeline
               </p>
             </div>
-            <div className="md:col-span-8 md:flex md:items-end md:justify-end">
+            <div className="md:col-span-8 md:flex md:items-end md:justify-end" data-reveal="up">
               <div className="md:max-w-xl md:text-right">
                 <p className="text-lg leading-relaxed text-neutral-500 dark:text-neutral-400">
                   Roles across product delivery, implementation, and shipping, presented as a hover-first timeline that opens into the actual work behind each position.
@@ -391,22 +395,25 @@ export const Experience: React.FC = () => {
             </div>
           </div>
 
-          <div className="h-px bg-black dark:bg-white" />
+          <div className="h-px bg-black dark:bg-white" data-reveal="line" />
 
-          <div className="hidden grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800 md:grid">
-            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5">
+          <div
+            className="hidden grid-cols-3 gap-px bg-neutral-200 dark:bg-neutral-800 md:grid"
+            data-reveal-stagger="80"
+          >
+            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5" data-reveal="up">
               <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                 Roles
               </p>
               <p className="mt-3 font-display text-[2rem] tracking-tight text-black dark:text-white md:text-3xl">{experiences.length}</p>
             </div>
-            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5">
+            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5" data-reveal="up">
               <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                 Current
               </p>
               <p className="mt-3 font-display text-[2rem] tracking-tight text-black dark:text-white md:text-3xl">{currentRoles}</p>
             </div>
-            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5">
+            <div className="bg-[#f4f4f4] px-3 py-4 dark:bg-black md:px-5 md:py-5" data-reveal="up">
               <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-neutral-400 dark:text-neutral-600">
                 Format
               </p>
@@ -416,9 +423,9 @@ export const Experience: React.FC = () => {
             </div>
           </div>
 
-          <div className="h-px bg-black dark:bg-white" />
+          <div className="h-px bg-black dark:bg-white" data-reveal="line" />
 
-          <div className="relative">
+          <div className="relative" data-reveal-stagger="90">
             {experiences.map((experience, index) => (
               <ExperienceCard
                 key={experience.id}
@@ -434,7 +441,7 @@ export const Experience: React.FC = () => {
             ))}
           </div>
 
-          <div className="h-px bg-black dark:bg-white" />
+          <div className="h-px bg-black dark:bg-white" data-reveal="line" />
         </div>
       </div>
     </section>
